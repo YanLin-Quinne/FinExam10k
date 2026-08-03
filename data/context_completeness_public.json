@@ -1,0 +1,160 @@
+{
+ "purpose": "Demonstrate that context incompleteness in FinExam-10K is a missing-referent property of the source material, not a missing-field property of the release. Every record is structurally complete. A subset of records asks about background, usually a table or a shared vignette, that existed as an image in the source and was therefore not extracted. Those records carry an explicit flag and a description of what is absent, and they are excluded from the context-complete analyses in the paper rather than silently scored.",
+ "scope": "released public partition, mock and practice items",
+ "structural_audit": {
+  "records": 5110,
+  "declared_fields": 19,
+  "records_missing_any_field": 0,
+  "records_with_empty_required_value": 0,
+  "gold_letter_out_of_range": 0,
+  "duplicate_ids": 0,
+  "verdict": "no record is malformed"
+ },
+ "context_completeness": {
+  "answerable_from_own_text": 3406,
+  "not_answerable_from_own_text": 1704,
+  "defect_breakdown": {
+   "none, item is context-complete": 3406,
+   "absent_table": 847,
+   "absent_vignette": 738,
+   "absent_labelled_object": 105,
+   "option_mismatch": 10,
+   "dangling_reference": 4
+  },
+  "defect_glossary": {
+   "absent_table": "the stem refers to a numeric table that was an image in the source and was not extracted",
+   "absent_vignette": "the item belongs to a shared case vignette that is not carried with it",
+   "absent_labelled_object": "the stem names a labelled figure, chart or panel that is not present",
+   "option_mismatch": "the options do not correspond to the quantity the stem asks for",
+   "dangling_reference": "the stem points at a referent that resolves to nothing in the source"
+  },
+  "distinct_missing_referents_described": 1470,
+  "most_common_missing_referents": {
+   "Exhibit 1": 31,
+   "Information about the company is absent": 24,
+   "Exhibit 1 and Exhibit 2": 21,
+   "Exhibit 1 and Exhibit 2 data": 18,
+   "Data about the company is absent": 8,
+   "data about the company": 5,
+   "Statements 1, 2, and 3 are undefined": 5,
+   "Exhibit 1 and its data": 4,
+   "Information about the bond is absent": 4,
+   "Actions 1 and 2 are undefined": 4,
+   "Statements 1 and 2 are not provided": 4,
+   "Exhibit 2": 3
+  },
+  "note": "missing_referent is free text written during adjudication, so its cardinality is high by design. It records what the stem points at, not a closed category."
+ },
+ "examples": {
+  "context_complete_hard": {
+   "why_shown": "every field present and the stem is answerable from its own text. This is what the majority of the release looks like.",
+   "id": "3e1de6e63f95bb37",
+   "exam": "CFA",
+   "level": "Level I",
+   "difficulty": "hard",
+   "answerable": true,
+   "answerability_defect": null,
+   "missing_referent": null,
+   "stem": "An analyst calculates a portfolio's target semideviation of returns over twelve consecutive months, including seven months of below-target returns. The sum of the squared deviations below the target is 42% 2 . The target semideviation is closest to:",
+   "options": [
+    "1.87%",
+    "1.95%.",
+    "2.65%."
+   ],
+   "answer": "B",
+   "all_19_fields_present": true
+  },
+  "absent_table": {
+   "why_shown": "the stem refers to a numeric table that was an image in the source and was not extracted. Note that the record itself is complete: the stem, the options, the gold answer and the rationale are all present. What is absent is background the stem refers to.",
+   "id": "d1ef950308307281",
+   "exam": "CFA",
+   "level": "Level I",
+   "difficulty": "easy",
+   "answerable": false,
+   "answerability_defect": "absent_table",
+   "missing_referent": "capital structure data",
+   "stem": "An analyst gathers the following information about a company's capital structure: If interest is tax-deductible and the marginal tax rate is 30%, the company's WACC is closest to:",
+   "options": [
+    "5.51%.",
+    "6.52%.",
+    "7.00%."
+   ],
+   "answer": "B",
+   "all_19_fields_present": true
+  },
+  "absent_vignette": {
+   "why_shown": "the item belongs to a shared case vignette that is not carried with it. Note that the record itself is complete: the stem, the options, the gold answer and the rationale are all present. What is absent is background the stem refers to.",
+   "id": "35e08dd9de487cc2",
+   "exam": "CFA",
+   "level": "Level II",
+   "difficulty": "medium",
+   "answerable": false,
+   "answerability_defect": "absent_vignette",
+   "missing_referent": "Company C bond data for CDS contract",
+   "stem": "The cheapest-to-deliver obligation for the CDS contract on the Company C senior unsecured bond is:",
+   "options": [
+    "Bond 1.",
+    "Bond 2.",
+    "Bond 3."
+   ],
+   "answer": "B",
+   "all_19_fields_present": true
+  },
+  "absent_labelled_object": {
+   "why_shown": "the stem names a labelled figure, chart or panel that is not present. Note that the record itself is complete: the stem, the options, the gold answer and the rationale are all present. What is absent is background the stem refers to.",
+   "id": "ce318b8d84683c9b",
+   "exam": "CFA",
+   "level": "Level II",
+   "difficulty": "hard",
+   "answerable": false,
+   "answerability_defect": "absent_labelled_object",
+   "missing_referent": "Method 1 and Method 2 are undefined",
+   "stem": "Compared to Method 2, RMRL's consolidated book value per share under Method 1 would be:",
+   "options": [
+    "lower.",
+    "the same.",
+    "higher."
+   ],
+   "answer": "A",
+   "all_19_fields_present": true
+  },
+  "option_mismatch": {
+   "why_shown": "the options do not correspond to the quantity the stem asks for. Note that the record itself is complete: the stem, the options, the gold answer and the rationale are all present. What is absent is background the stem refers to.",
+   "id": "461dc8bfda76699e",
+   "exam": "FRM",
+   "level": "Part I",
+   "difficulty": "hard",
+   "answerable": false,
+   "answerability_defect": "option_mismatch",
+   "missing_referent": "Calculation inputs for Option D are incomplete or incorrect.",
+   "stem": "Jude, a market analyst in Blue-blue bank, is estimating VaR. But her supervisory Tom tells her that there is another risk indicator called expected shortfall which is famous in risk measurement. Hence, Jude searches the information about the expected shortfall compared to VaR. Which of the following statements is most likely correct?",
+   "options": [
+    "Expected shortfall does not meet the property of subadditivity, so expected shortfall is n",
+    "Expected shortfall is a special case of spectral risk measures while VaR is not.",
+    "Expected shortfall distributes equal weights to all greater than the VaR while VaR tells n",
+    "If Jude accumulates 100 daily returns for a 10 million portfolio. The lowest ten returns a"
+   ],
+   "answer": "C",
+   "all_19_fields_present": true
+  },
+  "dangling_reference": {
+   "why_shown": "the stem points at a referent that resolves to nothing in the source. Note that the record itself is complete: the stem, the options, the gold answer and the rationale are all present. What is absent is background the stem refers to.",
+   "id": "64edb49dd7c1d75b",
+   "exam": "FRM",
+   "level": "Part I",
+   "difficulty": "easy",
+   "answerable": false,
+   "answerability_defect": "dangling_reference",
+   "missing_referent": "Statements 'shown as follows' are not provided",
+   "stem": "Jack, CEO of ALIALI E-commerce Platform Company, plans to issue a corporate bond for financing their new project abroad. He consults Lucy, the CFO of the company, about the bond issuance. Lucy has many years of investment and financing experience. She talks about many important issues of bond issuance that need attention. Some of them are...",
+   "options": [
+    "ALIALI can choose either private placement or public issue for bond issuance. Yields for p",
+    "Like the public issue, private placement also needs rating agencies involved, because the ",
+    "ALIALI needs to appoint a corporate bond trustee. The special role is a financial institut",
+    "When ALIALI issues bonds, setting the coupon rate equal to the yield to maturity determine"
+   ],
+   "answer": "D",
+   "all_19_fields_present": true
+  }
+ }
+}

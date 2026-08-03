@@ -1,0 +1,268 @@
+% =====================================================================
+% Dataset section for FinExam-10K.
+%
+% Structural choice worth stating up front: this section deliberately does
+% NOT propose a hand-designed question-type taxonomy. Reviewer 2yXH on the
+% companion paper rejected exactly that move as "unclear and non-mutually
+% exclusive, lacks grounding in established reasoning literature". We instead
+% report an empirical difficulty axis with measured reliability, which is a
+% claim that can be checked rather than argued about, and keep the exams' own
+% curriculum topics as the only categorical labels.
+%
+% \pending{} marks numbers awaiting the full answerability pass. The sampled
+% estimates carry Wilson intervals and are reportable as they stand.
+% =====================================================================
+\newcommand{\pending}[1]{#1}   % 定稿前改成 \textcolor{red}{#1} 自查，然后删掉
+
+\section{FinExam-10K}
+\label{sec:dataset}
+
+\textsc{FinExam-10K} is a benchmark of $10{,}198$ multiple-choice items drawn from the
+professional examinations that license financial analysts and risk managers. Two properties
+distinguish it from existing financial-reasoning corpora. First, difficulty is measured rather
+than asserted: every item carries an empirical band derived from the frozen responses of
+seventeen systems, and we report the reliability of that band. Second, half the corpus is
+held out, so the benchmark can serve as a leaderboard rather than a one-time evaluation.
+
+\subsection{Composition and Sources}
+
+Items span all five stages of the two examinations, three CFA levels and two FRM parts, as
+summarised in Table~\ref{tab:composition}. CFA items present three options and FRM items four,
+so chance accuracy differs by track at $33.3$ and $25.0$ percent respectively, and all
+cross-track comparisons in Section~\ref{sec:analysis} use chance-normalised accuracy.
+
+Two collection streams feed the corpus. Mock and practice material published for examination
+preparation forms the releasable half. Real examination items recalled and reconstructed by
+candidates form the held-out half. We keep the two streams separate throughout, never mix
+them within a release, and report every result on both halves so that readers can see whether
+the two behave alike. They do: the two halves rank the seventeen systems at Spearman $0.990$,
+while the public half is slightly the harder of the two, $16.8$ percent hard against $11.4$
+percent, Mann-Whitney $p=3.2\times10^{-11}$. A benchmark whose public half is easier than its
+hidden half would flatter every submission, so we note the direction explicitly.
+
+\paragraph{From collection to release.}
+Collection yielded $15{,}199$ items across the five stages. Two filters produce the released
+corpus. We first drop every item that arrives without the provider's worked rationale, which
+removes $1{,}484$ items, and then deduplicate, which removes a further $3{,}517$, leaving
+$10{,}198$. The rationale filter is the reason coverage in the next paragraph is complete: a
+worked rationale is a condition of entry rather than a property we were fortunate to find.
+
+That condition is not neutral across stages and we report its effect rather than only its
+benefit. Rationale availability is near total for CFA, $99.7$, $98.9$ and $100.0$ percent for
+Levels I to III, but far lower for FRM, $68.4$ percent for Part~I and $61.6$ percent for
+Part~II. The filter therefore removes about a third of the collected FRM material and almost no
+CFA material, and the resulting $7{,}631$ to $2{,}567$ imbalance between the two examinations is
+a consequence of that filter rather than of what was available to collect. Readers comparing
+across examinations should treat the FRM subset as the survivors of a stricter selection.
+
+\paragraph{Reference rationales.}
+Every one of the $10{,}198$ items carries the examination provider's own worked rationale, with
+no gaps in any stage or band. The rationales total $8.55$ million characters at a median of $752$
+per item, and $29.6$ percent adjudicate each option in turn rather than only justifying the key,
+in the form ``A Incorrect because \ldots\ B Correct because \ldots''. A quarter contain explicit
+arithmetic. Most professional-examination corpora release the stem, the options and the keyed
+letter alone, so this layer is what lets \textsc{FinExam-10K} support work that a bare
+answer key cannot: verifying whether a system reached the right answer for the stated reason,
+training and evaluating verifiers against a reference argument, and diagnosing which step of a
+multi-step derivation a system lost. We use the rationales in this paper only to audit keyed
+answers, and we do not place them in any model prompt.
+
+Each item carries its examination, stage, curriculum topic, options, keyed answer, the provider
+rationale, its empirical difficulty band and consensus pass rate, its release
+split, and the integrity flags described in Section~\ref{sec:quality}. We do not impose a
+question-type taxonomy of our own. The curriculum topics that the examination bodies already
+publish are retained as the only categorical labels, because a taxonomy invented for a paper
+invites the objection that its categories are neither exhaustive nor mutually exclusive, and
+because the empirical axis below carries the information a hand-built taxonomy would be
+proposing to capture.
+
+\subsection{Empirical Difficulty}
+\label{sec:difficulty}
+
+The exams publish a level ordering, but that ordering is a curriculum sequence rather than a
+statement about how hard an item is for a reasoning system. We therefore define
+\texttt{difficulty\_v1} from model consensus. Seventeen frozen systems answer every item at
+temperature $0$ under a fixed seed. The systems are partitioned into the ten proprietary ones
+and the seven with open weights, the mean pass rate is taken
+within each group, and the two group means are weighted equally so that band membership is not
+decided by whichever group happens to be larger. Items with a consensus pass rate at or above
+$2/3$ are easy, at or below $1/3$ are hard, and the remainder medium. This yields $6{,}578$ easy,
+$2{,}183$ medium and $1{,}437$ hard items.
+
+Three measurements support using this axis. Split-half reliability of the consensus score is
+$0.805$ Spearman and $0.892$ after the Spearman-Brown correction. The worst leave-one-model-out
+rank stability across the seventeen systems is $0.983$, so no single grader determines the
+partition. And Cram\'er's $V$ against the exams' own level labels is only $0.174$, so the two
+orderings are largely independent and the empirical axis is not a restatement of the published
+levels. Appendix~\ref{app:difficulty-robustness} reports the same construction under a flat
+seventeen-model average and under a three-group partition, and the appendix additionally rebuilds
+the bands with DeepSeek-R1 and GPT-4o excluded from the panel, since those two systems appear as
+backbones in the analysis of Section~\ref{sec:analysis}. Because the bands come from model
+consensus, every band-conditioned result in the main text is scored leave-one-out, so no system
+is graded against a partition it helped define.
+
+\subsection{Quality Control and Known Defects}
+\label{sec:quality}
+
+\paragraph{Expert review.}
+The corpus was reviewed by a four-person team with professional finance training, including
+authors of this paper. Review covered the content of each item: that the stem, options and keyed
+answer are faithful to the source, that the keyed answer agrees with the provider rationale, and
+that the curriculum topic assignment is correct. Because a single pass yields no measurable
+agreement, we additionally double-annotate a stratified sample of $400$ items and report Cohen's
+$\kappa$ in Appendix~\ref{app:iaa}.
+
+Content review and pipeline integrity are separate properties, and we report them separately. A
+reviewer checking an item against its source sees the source, so a vignette or exhibit that was
+lost during collection is visible to the reviewer and invisible in the shipped record. The
+automated audits below therefore examine the released records themselves, independently of the
+sources, and they surface defect classes that content review is not positioned to catch.
+
+\paragraph{Structural integrity.}
+Automated auditing finds no duplicate identifiers, no item whose keyed letter is absent from its
+own option set, and no item missing a rationale. It surfaces four defect classes that we flag
+rather than silently repair, and Table~\ref{tab:audit-outcomes} lists every count.
+
+$111$ items contain two options that are identical after Unicode normalisation and whitespace
+collapse, and in $80$ of those the keyed answer falls inside the duplicated pair, which makes the
+item unscorable because a system selecting the other member gives textually the same answer and
+is marked wrong. Five items contain an empty option and one presents only two options.
+
+Deduplication during construction used exact matching, and a normalised comparison that also
+folds case, punctuation and option order finds $1{,}192$ residual duplicate records in $1{,}148$
+groups, $11.7$ percent of the corpus. Typical pairs differ only by a hyphen in
+\emph{fixed-income}, by a trailing period, or by two options appearing in swapped order. This has
+one consequence worth stating plainly: $104$ of those groups straddle the release boundary and
+therefore expose $110$ held-out items, $2.2$ percent of the held-out half, to anyone reading
+the public half. We ship the affected identifiers so that the leakage can be excluded, and future
+releases will deduplicate under the normalised key. The corpus contains no contradictory key:
+all $58$ groups whose keyed letter differs across members are explained by reordered options and
+resolve to the same answer text.
+
+\paragraph{Answerability.}
+The larger defect is structural rather than typographic. Case-based examination items present a
+shared vignette and an exhibit table, and both are frequently delivered as images that a
+text-only collection pipeline does not capture. The result is items whose stem announces data it
+never supplies, for example a stem reading ``Given the following ratings transition matrix,
+calculate the two-period cumulative probability of default'' with no matrix, or one asking for a
+named company's free cash flow with the company never introduced. Such items cannot be answered
+from the text as shipped, and a system that fails them has demonstrated nothing about financial
+reasoning.
+
+A keyword detector for absent exhibits flags $732$ items, but it badly under-counts, because many
+affected stems name no exhibit at all and simply reference an entity that was defined in the
+missing vignette. We therefore label answerability directly for every item in the corpus. The
+labeller was gated before use against $90$ items independently adjudicated by a stronger reader:
+it agrees on $97.8$ percent, recovers $23$ of $23$ unanswerable items, and reaches a precision of
+$92.0$ percent, so it misses no defect in the calibration set and over-flags mildly. Applied to
+the full corpus it marks $2{,}573$ items unanswerable, $25.2$ percent, of which the keyword
+detector had found only $714$.
+
+\begin{center}
+\small
+\begin{tabular}{lrr}
+\toprule
+& \textbf{Not answerable} & \textbf{Rate} \\
+\midrule
+Easy   & $649/6{,}578$   & $9.9\%$ \\
+Medium & $859/2{,}183$   & $39.3\%$ \\
+Hard   & $1{,}065/1{,}437$ & $74.1\%$ \\
+\midrule
+CFA Level II & $1{,}209/2{,}215$ & $54.6\%$ \\
+FRM Part I   & $214/1{,}652$     & $13.0\%$ \\
+\midrule
+Overall & $2{,}573/10{,}198$ & $25.2\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The dominant defect is an absent table, $1{,}550$ items, followed by an absent vignette, $846$,
+an absent labelled object such as an undefined Statement~1, $142$, an option set belonging to a
+different question, $27$, and a dangling reference, $8$. At the measured precision roughly two
+hundred of the $2{,}573$ are expected to be false alarms, so the true count lies near $2{,}400$.
+
+Because the defect concentrates in the hard band, every hard-band claim in
+Section~\ref{sec:analysis} is reported twice, once over the full corpus and once over the
+answerable subset, and the flag together with the detected missing referent ships with every
+record so that users can reproduce or revise the partition.
+
+We report this rather than quietly dropping the affected items for two reasons. The flag is
+itself a usable research object, since the gap between answerable and unanswerable items measures
+how a system behaves when its evidence is incomplete, which is a realistic failure mode. And a
+benchmark that silently removes its inconvenient items cannot be audited by anyone else.
+
+\subsection{Public Development and Sequestered Test Splits}
+
+The $5{,}110$ mock and practice items are released in full. The $5{,}088$ recalled examination
+items are held out and evaluated only through a submission endpoint. Splitting by collection
+stream rather than at random means the public half cannot be used to infer the hidden half by
+near-duplicate matching, which a random split over a corpus containing paraphrased variants would
+not prevent.
+
+Splitting by stream leaves the two halves unmatched in composition, and we state the differences
+rather than average them away. The public half is $84.5$ percent CFA and $60.8$ percent Level I,
+while the held-out half is $65.1$ percent CFA with Level I at $32.5$ percent and a
+correspondingly larger FRM share. It also carries the higher defect rate, $33.3$ percent
+unanswerable against $17.1$ percent.
+
+That last difference reverses the apparent difficulty ordering, and the reversal is the practical
+caveat for anyone tuning on this benchmark. Measured over the full corpus the public half looks
+harder, with all seventeen systems scoring lower on it, $70.70$ against $75.28$. Measured over
+the answerable subset the ordering flips: the public half is the easier of the two, $83.83$
+against $81.63$, and no system scores lower on it. The apparent difficulty of the public half was
+its defect rate rather than its content. Development scores computed on the answerable public
+items should therefore be read as roughly two points optimistic relative to the held-out set. We
+retain the stream-based split despite this, because it is what prevents a paraphrase in the
+public half from revealing its counterpart in the held-out half, and a random split over a corpus
+containing recalled variants of practice material would not. The seventeen systems still rank
+almost identically on the two halves, Spearman $0.9902$, so the public half remains usable for
+model selection even though its absolute level is offset.
+
+\subsection{Versioning and Quarterly Refresh}
+\label{sec:versioning}
+
+\textsc{FinExam-10K} is maintained rather than frozen. We publish four versioned refreshes per
+year, aligned with the February, May, August and November examination seasons. Each release adds
+newly collected and expert-reviewed items where licensing permits, updates curriculum metadata,
+repeats exact and semantic near-duplicate auditing, re-estimates \texttt{difficulty\_v1} against
+the then-current model panel, and freezes a new public-development and held-out test manifest.
+
+Not every stage is administered in every examination window, so the four checkpoints are
+maintenance events rather than four complete replacements of all five subsets. Items are added to
+the relevant stage when authorised material becomes available and passes the same review and
+leakage-control procedures as the initial release.
+
+Every leaderboard entry is bound to a dataset version, a model revision, a prompt configuration
+and an evaluation date. New releases do not overwrite historical scores. The leaderboard retains
+results for earlier versions and reports the current release separately, which lets the benchmark
+track progress while limiting the staleness and repeated exposure that accumulate on a
+permanently fixed test set. Because \texttt{difficulty\_v1} is defined against a specific model
+panel, each release also records the panel used, and bands are never silently recomputed under an
+existing version number.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{llrrr}
+\toprule
+\textbf{Exam} & \textbf{Stage} & \textbf{Items} & \textbf{Public} & \textbf{Held out} \\
+\midrule
+\multirow{3}{*}{CFA} & Level I   & 4{,}763 & 3{,}109 & 1{,}654 \\
+                     & Level II  & 2{,}215 & 1{,}030 & 1{,}185 \\
+                     & Level III & 653     & 179     & 474 \\
+\midrule
+\multirow{2}{*}{FRM} & Part I    & 1{,}652 & 516     & 1{,}136 \\
+                     & Part II   & 915     & 276     & 639 \\
+\midrule
+\multicolumn{2}{l}{\textbf{Total}} & \textbf{10{,}198} & \textbf{5{,}110} & \textbf{5{,}088} \\
+\midrule
+\multicolumn{2}{l}{\textit{Difficulty band}} & & & \\
+\multicolumn{2}{l}{\quad Easy}   & 6{,}578 & 3{,}164 & 3{,}414 \\
+\multicolumn{2}{l}{\quad Medium} & 2{,}183 & 1{,}087 & 1{,}096 \\
+\multicolumn{2}{l}{\quad Hard}   & 1{,}437 & 859     & 578 \\
+\bottomrule
+\end{tabular}
+\caption{Composition of \textsc{FinExam-10K}. CFA items carry three options and FRM items four.
+Bands are \texttt{difficulty\_v1}, defined in Section~\ref{sec:difficulty} from the consensus of
+seventeen frozen systems rather than from the examinations' own level labels.}
+\label{tab:composition}
+\end{table}

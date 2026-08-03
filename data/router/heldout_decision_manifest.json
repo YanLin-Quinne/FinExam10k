@@ -1,0 +1,31 @@
+{
+ "scope": "held-out partition, 5,088 items",
+ "what_this_is": "A verifiable record of the held-out gate evaluation that does not expose which items were routed. The decision vector is the per-item fire/no-fire bit in ascending item-id order. Its sha256 is published so that anyone who obtains the held-out partition under the leaderboard protocol can recompute the vector and confirm it matches, without us releasing the partition or the per-item mapping.",
+ "n_items": 5088,
+ "fired": 404,
+ "fire_rate": 0.0794,
+ "routing_distribution": {
+  "direct": 4684,
+  "graph": 404
+ },
+ "decision_vector_sha256": "16f15840cbdf4103827d338733bece84f47e6bca343abf4ee04d2fb789fae27b",
+ "held_out_id_set_sha256": "5b8e184906b5ba47580f2cadad750ffdc8ab9f82eb149f0e34359812aa69e178",
+ "reported_outcome": {
+  "always_direct_correct": 3604,
+  "gate_correct": 3624,
+  "rescue": 55,
+  "harm": 35,
+  "net_points": 0.39,
+  "mcnemar_exact_p": 0.0446,
+  "context_complete_subset": {
+   "n": 4219,
+   "always_direct": 78.34,
+   "gate": 78.88,
+   "rescue": 31,
+   "harm": 8,
+   "net_points": 0.55,
+   "mcnemar_exact_p": 0.0003
+  }
+ },
+ "how_to_verify": "Run code/router/gate_infer.py against the held-out partition with data/router/gate_frozen.json. The script prints the decision-vector sha256. If it matches the value above, the frozen model reproduced the reported evaluation exactly."
+}

@@ -1,0 +1,63 @@
+% =====================================================================
+% RQ3.  Every number here is produced by make_router_table.py and
+% matches tab:router exactly.  Do not edit numbers by hand.
+% =====================================================================
+
+\paragraph{RQ3: Is the decision to intervene learnable from what a single call reveals?}
+\label{sec:rq3-router}
+
+Section~\ref{sec:rq2} showed that a static intervention helps or hurts depending on whether the
+item needed external knowledge in the first place, and that applying one indiscriminately is
+significantly worse than not applying it at all. That turns the problem from a retrieval-quality
+question into a decision question: can a system tell, before paying for a second call, whether
+that call will repair its answer or break it.
+
+\paragraph{Protocol.} The gate is a logistic model over $27$ features fitted on the $5{,}110$
+public items. Its regularisation strength and decision threshold are chosen by five-fold
+cross-validation inside that split, the fitted coefficients and threshold are written to disk, and
+only then is the held-out feature matrix constructed. A whitelist guard raises if a held-out
+identifier reaches the fitting path, so the separation is enforced rather than asserted. The
+held-out half is scored once. No feature reads the gold answer, any correctness flag, or any
+statistic computed over held-out items.
+
+\paragraph{The gate sees one call, not three.} This is the design choice that makes the comparison
+meaningful. A selector whose features include the predictions of every condition has already paid for
+every condition, so it sits in the same budget class as majority voting over those conditions, and majority
+voting requires no training. We therefore restrict the gate to what the Direct call itself
+exposes, its sandbox execution and parser status, its error code, its token counts and latency,
+and the option letter it chose, together with properties of the item text. The gate pays for a
+second call only where it fires, which is $1.08\times$ the compute of Always Direct on the
+held-out half and $1.04\times$ on its context-complete part.
+
+\paragraph{Result.} Table~\ref{tab:router} reports every policy at its true budget. All three
+fixed policies that always intervene are significantly worse than never intervening, Function-RAG
+at $-1.16$ points ($p=0.007$) and \textsc{FunctionGraph-RAG} at $-1.10$ ($p=0.020$). The gate is
+the only policy that significantly improves on Always Direct, gaining $0.39$ points on the
+held-out half ($p=0.045$, bootstrap $95\%$ CI $[+0.04,+0.77]$) and $0.55$ points on the
+context-complete part ($p<0.001$, CI $[+0.26,+0.83]$). On the context-complete part it fires on
+$4.3\%$ of items and converts $31$ items while breaking $8$, a rescue to harm ratio of almost four
+to one. Neither trivial baseline reproduces this. Switching whenever the two conditions disagree is
+identical to always intervening, and switching at random at the gate's own firing rate gains
+$0.16$ points on the held-out half ($p=0.302$) and nothing at all on the context-complete part,
+which shows the gain comes from the decision and not from the rate.
+
+\paragraph{What this does and does not establish.} The effect is small in absolute terms and we do
+not claim otherwise. Its significance rests on a favourable rescue to harm ratio on a small number
+of interventions rather than on a large accuracy movement. What it establishes is that the
+intervention decision carries signal observable at inference time, which the aggregate results of
+Section~\ref{sec:rq2} would not have predicted, and that this signal is available from a single
+call rather than requiring every branch to be executed first. The three-condition post-hoc selector,
+which does require that, reaches $71.36$ but is not separable from Always Direct ($p=0.107$) and
+is barely above majority voting at the same budget, $71.36$ against $71.21$.
+
+\paragraph{The ceiling this leaves.} The oracle over the same three conditions reaches $77.75$, and that
+number is not a stronger method but an identity: it equals $100$ minus the $22.25\%$ of held-out
+items on which all three conditions fail. The routing decision is live on only $784$ of $5{,}088$ items,
+since on the remaining $84.6\%$ every condition agrees and the choice cannot matter, and within that
+space $432$ items where Direct succeeds and an intervention would break it outnumber the $352$
+where the reverse holds. A gate must therefore clear $44.9\%$ precision merely to break even. The
+$6.92$ points separating Always Direct from the oracle bound what any selector over these conditions can
+recover. The larger quantity is elsewhere: the $1{,}132$ items no condition answers correctly are worth
+$22.25$ points, of which $440$ lack the context needed to answer at all and $692$ are fully
+specified and simply not solved. Those are not selection problems, and closing them requires
+enlarging the action space rather than choosing better within it.

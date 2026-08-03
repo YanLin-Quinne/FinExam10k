@@ -1,0 +1,89 @@
+{
+  "artifact_sha256": "78d4a58df3c1418a17c16433bb1a6faab08c66c13c6595c6925770565a5c3564",
+  "bias": -1.421440585059841e-18,
+  "candidate_id_set_hash": "db2da9ac6306a0ab3e588ea8a9accd24128e8b6640c055970768b7bbec9970b4",
+  "candidate_protocol": {
+    "graph_expansion": {
+      "hops": 1,
+      "order": "after_top_k"
+    },
+    "index": "faiss.IndexFlatIP",
+    "lineage": "frozen_contriever_question_only_top30_graph_expansion",
+    "model_provenance": {
+      "model_id": "facebook/contriever-msmarco",
+      "revision": "abe8c1493371369031bcb1e02acb754cf4e162fa"
+    },
+    "normalization": false,
+    "pooling": "CLS last_hidden_state[:,0,:]",
+    "query_input": "question_only",
+    "similarity": "inner_product",
+    "top_k": 30
+  },
+  "candidate_protocol_fingerprint": "2708918337f2606f60b0bd339a1d82f7f9b27fd94ac44448d5bc23e20776aafc",
+  "feature_schema": [
+    "reciprocal_rank",
+    "reciprocal_depth",
+    "edge_weight",
+    "degree_scale"
+  ],
+  "feature_schema_hash": "5106b3c39cc1ca52f3eda9ff7737a87bef0b56d2a3ca677e7d50b8993d30a9cd",
+  "finexam_id_fingerprint": "eef7ee1a2392f50793c58b702c5b2948d069ab27439fbe273be6f2b1644d5e05",
+  "finexam_id_manifest_sha256": "071ef5d99d5c7a7c4f00d38a5e3052ec3c58e1259a1e490d7fb1b3cda10c6baa",
+  "finexam_overlap_audit": {
+    "count": 0,
+    "method": "code_computed_id_intersection"
+  },
+  "function_catalog_hash": "da60dc5b8c81e3bca9e98da2f5a58d83f46bb34e77de3b2d43a4ff9553e6bbc6",
+  "graph_artifact_sha256": "86ab9beb92fa299a3a9254a1441687f0020486d621702a15f8800c4cb3823469",
+  "label_semantics": "direct_function_id_relevance",
+  "label_source_fingerprint": "0d73013f2b6b8ae6bd20720a62b1d8a786673fb84ec4689efd6daf8b2ac09b0a",
+  "label_source_sha256": "4ea4cb828b4ca8e8a1102702d05c66d5562ce1c9cc1dda238adf0772ec823f21",
+  "schema_version": 3,
+  "seed": 202607,
+  "source_commit": "b0fe6455396f831955e4eb988472b4a563403bc5",
+  "source_dataset": "BUPT FinanceReasoning",
+  "source_split_counts": {
+    "Easy": 124,
+    "Medium": 387
+  },
+  "source_splits": [
+    "Easy",
+    "Medium"
+  ],
+  "split_counts": {
+    "test": 42,
+    "train": 403,
+    "validation": 66
+  },
+  "threshold": 0.0,
+  "training_metrics": {
+    "test": {
+      "pair_accuracy": 0.8597890751757706,
+      "pairs": 7396
+    },
+    "train": {
+      "pair_accuracy": 0.8717310824818599,
+      "pairs": 67530
+    },
+    "validation": {
+      "pair_accuracy": 0.8565109695682944,
+      "pairs": 11304
+    }
+  },
+  "training_objective": "linear_pairwise_function_relevance",
+  "training_source_kind": "direct_function_relevance_labels",
+  "training_statistics": {
+    "accepted": 511,
+    "rejected": 241,
+    "retrieval_stage_exclusions": {
+      "label_not_in_candidate_pool": 241
+    },
+    "total_labeled": 752
+  },
+  "weights": [
+    1.4832631266246088,
+    1.754710051620671,
+    0.0,
+    -0.03688101595302568
+  ]
+}

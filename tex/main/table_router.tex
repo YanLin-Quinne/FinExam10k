@@ -1,0 +1,35 @@
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4.0pt}
+\renewcommand{\arraystretch}{1.06}
+\begin{tabular}{@{}lccrrrrr@{}}
+\toprule
+\textbf{Policy} & \textbf{Cost} & \textbf{Acc.} & \textbf{95\% CI} & \textbf{Resc.} & \textbf{Harm} & \textbf{$\Delta$} & \textbf{$p$} \\
+\midrule
+\multicolumn{8}{@{}l}{\textit{Held-out half} ($N=5{,}088$)} \\
+Always Direct & $1\times$ & 70.83 & [69.6, 72.1] & -- & -- & -- & -- \\
+Always Function-RAG & $1\times$ & 69.67 & [68.4, 70.9] & 199 & 258 & $-1.16$ & \textbf{0.007} \\
+Always FunctionGraph-RAG & $1\times$ & 69.73 & [68.5, 71.0] & 252 & 308 & $-1.10$ & \textbf{0.020} \\
+\textbf{Gate router (frozen)} & $1.08\times$ & \textbf{71.23} & [70.0, 72.5] & 55 & 35 & $+0.39$ & \textbf{0.045} \\
+Switch on condition disagreement & $3\times$ & 69.73 & [68.5, 71.0] & 252 & 308 & $-1.10$ & \textbf{0.020} \\
+Random switch at matched rate & $3\times$ & 70.99 & [69.7, 72.2] & 27 & 19 & $+0.16$ & 0.302 \\
+Majority vote over three conditions & $3\times$ & 71.21 & [69.9, 72.4] & 99 & 80 & $+0.37$ & 0.178 \\
+Post-hoc selector over three conditions & $3\times$ & 71.36 & [70.1, 72.6] & 144 & 117 & $+0.53$ & 0.107 \\
+\textit{Oracle ceiling} & n/a & 77.75 & [76.6, 78.9] & 352 & 0 & $+6.92$ & n/a \\
+\midrule
+\multicolumn{8}{@{}l}{\textit{Held-out $\cap$ context-complete} ($N=4{,}219$)} \\
+Always Direct & $1\times$ & 78.34 & [77.1, 79.6] & -- & -- & -- & -- \\
+Always Function-RAG & $1\times$ & 77.39 & [76.1, 78.6] & 122 & 162 & $-0.95$ & \textbf{0.020} \\
+Always FunctionGraph-RAG & $1\times$ & 77.36 & [76.1, 78.6] & 166 & 207 & $-0.97$ & \textbf{0.038} \\
+\textbf{Gate router (frozen)} & $1.04\times$ & \textbf{78.88} & [77.6, 80.1] & 31 & 8 & $+0.55$ & \textbf{$<$0.001} \\
+Switch on condition disagreement & $3\times$ & 77.36 & [76.1, 78.6] & 166 & 207 & $-0.97$ & \textbf{0.038} \\
+Random switch at matched rate & $3\times$ & 78.31 & [77.0, 79.5] & 14 & 15 & $-0.02$ & 1.000 \\
+Majority vote over three conditions & $3\times$ & 78.64 & [77.4, 79.9] & 66 & 53 & $+0.31$ & 0.271 \\
+Post-hoc selector over three conditions & $3\times$ & 78.90 & [77.6, 80.1] & 90 & 66 & $+0.57$ & 0.065 \\
+\textit{Oracle ceiling} & n/a & 83.60 & [82.5, 84.7] & 222 & 0 & $+5.26$ & n/a \\
+\bottomrule
+\end{tabular}
+\caption{Selective intervention routing, evaluated once on the held-out half after the model and its threshold were frozen on the $5{,}110$ public items. Rescue, Harm, $\Delta$ and $p$ are against Always Direct using a two-sided exact McNemar test, and bold $p$ marks significance at $0.05$. \textbf{Cost} is backbone calls per item. The gate reads only the Direct call's own output and the item text, so it pays for a second call only where it fires, $1.08\times$ on the held-out half and $1.04\times$ on its context-complete part. Every policy that consults all three conditions before choosing has already spent $3\times$ and therefore belongs with majority voting, which needs no training and is the honest control at that budget. Every fixed intervention policy is significantly worse than not intervening. The gate is the only policy that significantly improves on Always Direct, and it does so at close to the same cost. The oracle picks a correct condition post hoc wherever one exists and is not deployable.}
+\label{tab:router}
+\end{table*}

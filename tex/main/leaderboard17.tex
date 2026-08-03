@@ -1,0 +1,40 @@
+% ===== FinExam-10K leaderboard, 17 models, three groups =====
+% preamble: \usepackage{booktabs,multirow}
+\begin{table*}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l ccc cc cc c r}
+\toprule
+\multirow{2}{*}{\textbf{Model}} & \multicolumn{3}{c}{\textbf{CFA} (3 options, chance $33.3\%$)} & \multicolumn{2}{c}{\textbf{FRM} (4 options, chance $25.0\%$)} & \multicolumn{2}{c}{\textbf{Track average}} & \multirow{2}{*}{\textbf{Overall}} & \multirow{2}{*}{\textbf{Unp.}} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8}
+ & L-I & L-II & L-III & P-I & P-II & CFA & FRM & & \\
+\midrule
+\multicolumn{10}{l}{\textit{Proprietary}} \\
+Gemini-3.1-Pro$^{\dagger}$ & \textbf{90.95} & \textbf{71.74} & \underline{77.79} & \underline{90.86} & \underline{83.93} & \textbf{84.25} & \underline{88.39} & \textbf{85.29} & 26 \\
+gpt-5.6-sol & \underline{89.61} & \underline{71.15} & \textbf{78.10} & \textbf{91.28} & \textbf{85.36} & \underline{83.27} & \textbf{89.17} & \underline{84.75} & 0 \\
+gpt-5.6-terra & 86.73 & 69.21 & 75.80 & 90.38 & 83.72 & 80.71 & 88.00 & 82.55 & 2 \\
+DeepSeek-V4-Pro$^{\dagger}$ & 87.05 & 69.03 & 75.65 & 89.47 & 82.62 & 80.84 & 87.03 & 82.40 & 28 \\
+gpt-5.6-luna & 85.53 & 65.96 & 72.89 & 86.74 & 79.13 & 78.77 & 84.03 & 80.09 & 3 \\
+Claude-Sonnet-5 & 84.95 & 66.05 & 73.81 & 86.74 & 78.25 & 78.51 & 83.72 & 79.82 & 119 \\
+DeepSeek-R1 & 84.90 & 65.55 & 74.89 & 86.02 & 79.45 & 78.43 & 83.68 & 79.75 & 5 \\
+Qwen3.7-Max & 80.54 & 61.58 & 70.75 & 78.21 & 73.01 & 74.20 & 76.35 & 74.74 & 4 \\
+GPT-5.5$^{\dagger}$ & 79.00 & 58.10 & 66.31 & 81.90 & 75.96 & 71.85 & 79.78 & 73.85 & 0 \\
+GPT-4o & 75.96 & 56.75 & 63.09 & 70.52 & 65.57 & 69.28 & 68.76 & 69.15 & 1 \\
+\midrule
+\multicolumn{10}{l}{\textit{Open-weight reasoning}} \\
+gpt-oss-120b & 81.21 & 61.81 & 71.36 & 83.96 & 69.51 & 74.73 & 78.81 & 75.76 & 11 \\
+gpt-oss-20b & 75.50 & 57.52 & 64.93 & 77.18 & 62.95 & 69.37 & 72.11 & 70.06 & 231 \\
+\midrule
+\multicolumn{10}{l}{\textit{Finance-specialized}} \\
+ODA-Fin-RL-8B & 75.46 & 54.49 & 62.63 & 72.22 & 58.91 & 68.27 & 67.47 & 68.07 & 825 \\
+Fin-o1-14B & 72.43 & 53.23 & 59.11 & 69.07 & 60.44 & 65.72 & 65.99 & 65.79 & 127 \\
+DianJin-R1-32B & 70.65 & 52.42 & 60.49 & 68.46 & 62.30 & 64.49 & 66.26 & 64.93 & 467 \\
+Hawkish-8B & 57.65 & 45.33 & 49.62 & 51.51 & 44.04 & 53.39 & 48.85 & 52.25 & 37 \\
+Fin-R1-7B & 57.74 & 40.90 & 47.47 & 52.91 & 45.36 & 51.97 & 50.21 & 51.53 & 1,224 \\
+\midrule
+\textit{Items} & 4{,}763 & 2{,}215 & 653 & 1{,}652 & 915 & 7{,}631 & 2{,}567 & 10{,}198 & \\
+\bottomrule
+\end{tabular}
+\caption{Native accuracy (\%) on \textsc{FinExam-10K} ($N=10{,}198$) under a unified English multiple-choice protocol with no knowledge augmentation. Every model answers every item. CFA items offer three options (chance accuracy $33.3\%$) and FRM items four (chance $25.0\%$), so the two tracks are not directly comparable on raw accuracy. \textbf{Unp.} counts responses that could not be parsed into a valid option; these are scored incorrect. \textbf{Best} per column in bold, \underline{second-best} underlined. $^{\dagger}$Run with an explicitly set, non-default reasoning budget: GPT-5.5 (\texttt{none}), Gemini-3.1-Pro (\texttt{low}), DeepSeek-V4-Pro (\texttt{high}). All other models use provider defaults. $^{\ddagger}$Run still in progress; figures provisional.}
+\label{tab:leaderboard}
+\end{table*}

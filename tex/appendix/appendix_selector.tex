@@ -1,0 +1,94 @@
+% =====================================================================
+% Appendix: the two FunctionGraph-RAG selectors.
+% Every number here is read from the shipped artifact files. Do not edit
+% numbers by hand: pot_selector_frozen.json and cot_selector_frozen.json
+% in the artifact carry them, and a reviewer can diff them against this.
+% =====================================================================
+
+\section{FunctionGraph-RAG: construction of both selectors}
+\label{app:selector}
+
+The two reasoning chains use separate selectors. They share a name and a purpose and almost
+nothing else, so we describe them separately rather than presenting an average of the two. The
+main-text results in Table~\ref{tab:rq2-full} are produced by the Program-of-Thought selector.
+
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lll@{}}
+\toprule
+& \textbf{PoT chain} & \textbf{CoT chain} \\
+& GPT-4o & DeepSeek-R1 \\
+\midrule
+Retrieval        & Contriever top-$30$   & BM25 top-$30$ \\
+Graph edges      & shared title $\cup$ kNN & shared quantity \\
+Expansion        & one hop, uncapped     & two hops, capped at $80$ \\
+Selector         & linear, $4$ features  & linear, $56$ features \\
+Injected         & at most $3$           & top $10$ \\
+\addlinespace[2pt]
+Labels           & $511$                 & $890$ \\
+Splits used      & Easy, Medium          & Easy, Medium, Hard \\
+Train/val/test   & $403$/$66$/$42$       & $678$/$106$/$106$ \\
+Objective        & pairwise ranking      & pairwise ranking \\
+\bottomrule
+\end{tabular}
+\caption{The two selectors. Both are fitted on direct \texttt{function\_id} relevance labels from
+FinanceReasoning and neither sees a \textsc{FinExam-10K} item, answer or correctness signal at any
+point.}
+\label{tab:selectors}
+\end{table}
+
+\paragraph{Program-of-Thought chain.}
+Candidates are the frozen Contriever top-$30$ cached from the upstream run, asserted at load time
+to be exactly $30$ unique identifiers present in the function catalogue. Those $30$ are expanded by
+one hop over a static graph whose edge set is the union of two relations: two functions are
+adjacent when they share an \texttt{article\_title}, and each function is additionally linked to
+its $k{=}4$ nearest neighbours under Contriever inner product. The graph is built once from the
+function corpus alone, and the builder never opens a benchmark item, an answer, a model output or
+a correctness flag. It has $3{,}133$ nodes and $15{,}889$ directed edges, degree minimum $4$,
+median $5$, maximum $11$, and no isolated node. Expansion is exactly one hop and is not capped:
+neighbours of the $30$ roots enter the pool, neighbours of neighbours do not. The resulting pool
+has median size $98$.
+
+A frozen linear model scores the pool over four features, the reciprocal of retrieval rank, the
+reciprocal of graph depth, edge weight, and a degree scale, and the top three are injected. It was
+fitted on $511$ direct \texttt{function\_id} relevance labels drawn from the Easy and Medium splits
+of FinanceReasoning, $403$ for training, $66$ for validation, $42$ for test, under a pairwise
+ranking objective, reaching test pair accuracy $0.860$. Of $752$ labelled examples, $241$ were
+excluded because the labelled function does not appear in the candidate pool under this retrieval
+protocol, which is recorded in the artifact rather than silently dropped.
+
+\paragraph{Chain-of-Thought chain.}
+Candidates are BM25 top-$30$. The graph is different in kind: two functions are adjacent when they
+share a normalised quantity name, where a quantity is a function's Python parameter name or the
+name of the variable it returns, matched after lowercasing, tokenisation, stopword removal, a
+suffix singulariser and a nineteen-entry alias table. Expansion is nominally two hops with a cap of
+$80$ candidates. In practice the cap is reached during the first hop on every query we inspected,
+so the second hop contributes almost nothing, and the trained weights on the two-hop indicator
+features are exactly zero. A linear reranker over $56$ features returns the top ten. It was fitted
+on $890$ relevance labels from the Easy, Medium and Hard splits, $678$/$106$/$106$.
+
+\paragraph{Which artifact produced the reported numbers.}
+The upstream release contains a second Chain-of-Thought selector, fitted on Easy and Medium only,
+with $736$ accepted labels and a $560$/$88$/$88$ split. It shares a \texttt{model\_version} string
+with the one used here, because that field is a hardcoded constant rather than a real identifier,
+and the two are distinguishable only by their file hashes. \textbf{The $736$-label selector did not
+produce any number reported in this paper.} The results we report were run with the $890$-label
+artifact, and both files ship so the distinction can be checked by hash.
+
+\paragraph{Reproduction boundary.}
+Selector inference is fully reproducible from the artifact: the graph, the coefficients, the
+candidate protocol and the expansion code are all released. Selector \emph{training} is not, since
+it consumes FinanceReasoning relevance labels that belong to that dataset. What is released instead
+is the training code, the split counts, the accepted and rejected label counts, and a
+candidate-protocol fingerprint that pins training-time and inference-time candidate construction to
+the same definition, so a reader can verify that the selector was not fitted under one retrieval
+protocol and deployed under another.
+
+\paragraph{Relation to prior work.}
+Our implementation follows the Function-RAG formulation rather than reproducing it exactly. The
+selector is trained on FinanceReasoning and applied to \textsc{FinExam-10K} without adaptation,
+which makes every number we report an out-of-distribution transfer. We state this rather than
+claiming a faithful reimplementation, because the differences above are real and a reader
+comparing against the original should know where they are.

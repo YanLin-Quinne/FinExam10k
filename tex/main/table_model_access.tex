@@ -1,0 +1,61 @@
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.08}
+
+\begin{tabularx}{\textwidth}{@{}l >{\raggedright\arraybackslash}X l@{}}
+\toprule
+\multicolumn{3}{@{}l}{\textit{Proprietary, API-served}} \\
+\midrule
+\textbf{Model} & \textbf{Model identifier} & \textbf{Reasoning setting} \\
+\midrule
+Claude-Sonnet-5 & \texttt{anthropic/claude-sonnet-5}     & provider default \\
+\addlinespace[2pt]
+DeepSeek-V4-Pro & \texttt{deepseek/deepseek-v4-pro}      & high \\
+DeepSeek-R1     & \texttt{deepseek/deepseek-reasoner}    & provider default \\
+\addlinespace[2pt]
+Gemini-3.1-Pro  & \texttt{google/gemini-3.1-pro-preview} & low \\
+\addlinespace[2pt]
+GPT-5.6-Sol     & \texttt{openai/gpt-5.6-sol}            & provider default \\
+GPT-5.6-Terra   & \texttt{openai/gpt-5.6-terra}          & provider default \\
+GPT-5.6-Luna    & \texttt{openai/gpt-5.6-luna}           & provider default \\
+GPT-5.5         & \texttt{openai/gpt-5.5}                & none \\
+GPT-4o          & \texttt{openai/gpt-4o-2024-11-20}      & provider default \\
+\addlinespace[2pt]
+Qwen3.7-Max     & \texttt{qwen/qwen3.7-max}              & provider default \\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.8em}
+
+\begin{tabularx}{\textwidth}{@{}l >{\raggedright\arraybackslash}X l c c c@{}}
+\toprule
+\multicolumn{6}{@{}l}{\textit{Open-weight, locally deployed}} \\
+\midrule
+\textbf{Model} & \textbf{Hugging Face identifier} & \textbf{Precision} & \textbf{TP} & \textbf{GPUs} & \textbf{Batch} \\
+\midrule
+\multicolumn{6}{@{}l}{\hspace{2pt}\textit{General-purpose reasoning}} \\
+GPT-OSS-120B   & \texttt{openai/gpt-oss-120b}         & MXFP4/BF16 & 1 & 1 & 1 \\
+GPT-OSS-20B    & \texttt{openai/gpt-oss-20b}          & MXFP4/BF16 & 1 & 1 & 4 \\
+\midrule
+\multicolumn{6}{@{}l}{\hspace{2pt}\textit{Finance-specialized}} \\
+DianJin-R1-32B & \texttt{DianJin/DianJin-R1-32B}      & BF16 & 2 & 2 & 2 \\
+Fin-O1-14B     & \texttt{TheFinAI/Fin-o1-14B}         & BF16 & 1 & 1 & 4 \\
+ODA-Fin-RL-8B  & \texttt{OpenDataArena/ODA-Fin-RL-8B} & BF16 & 1 & 1 & 4 \\
+Hawkish-8B     & \texttt{mukaj/Llama-3.1-Hawkish-8B}  & BF16 & 1 & 1 & 4 \\
+Fin-R1-7B      & \texttt{SUFE-AIFLM-Lab/Fin-R1}       & BF16 & 1 & 1 & 4 \\
+\bottomrule
+\end{tabularx}
+
+\caption{Model access and serving configurations for the seventeen-system panel, grouped as
+throughout the paper into ten proprietary systems, two open-weight general-purpose reasoning
+systems and five open-weight finance-specialized systems. Proprietary systems are listed by
+vendor and then by release recency rather than by score, so the table is read as a description
+of the panel and not as a ranking. Parameter counts for proprietary systems are omitted because
+they are not publicly disclosed. Reasoning settings are provider defaults except where shown.
+Every locally deployed run uses a $32{,}768$-token context window and an $8{,}192$-token
+completion budget on NVIDIA H100 accelerators, and every checkpoint is pinned to an immutable
+commit whose revision ships with the released evaluation configuration.}
+\label{tab:model-access-config}
+\end{table*}

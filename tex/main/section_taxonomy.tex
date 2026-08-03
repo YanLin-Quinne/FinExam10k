@@ -1,0 +1,57 @@
+% =====================================================================
+% Subject taxonomy: body paragraph for the Dataset section, plus the
+% figure caption. Numbers recomputed by make_category_figures.py and
+% verified against the released files.
+% =====================================================================
+
+\subsection{Subject Coverage}
+\label{sec:taxonomy}
+
+We retain the curriculum subjects that the examination bodies themselves publish rather than
+introducing a taxonomy of our own. A category scheme invented for a paper invites the objection
+that its classes are neither exhaustive nor mutually exclusive, and the empirical difficulty
+axis of Section~\ref{sec:difficulty} already carries the information such a scheme would be
+proposing to capture. The published subjects are, by contrast, the units against which
+candidates study and against which the examinations are blueprinted, so a result reported by
+subject is interpretable without further argument.
+
+$5{,}088$ of the $10{,}198$ items carry a subject label. Coverage is not random. The source
+metadata tags mock and practice material with a paper identifier such as \texttt{2026 Practice
+Exam A} and tags recalled examination items with a subject, so the labelled items are exactly
+the held-out half and the public half carries no subject at all. Any subject-level statement in
+this paper therefore describes the held-out partition, and we mark it as such wherever it
+appears. Two spelling variants in the source were merged, \texttt{Quantitative} into
+\texttt{Quantitative Methods} and \texttt{Ethic} into \texttt{Ethical and Professional
+Standards}, which restores CFA Level~I to the ten subjects the curriculum defines.
+
+The labelled items span $26$ distinct subjects across two examinations and five stages, and no
+subject is shared between CFA and FRM. Figure~\ref{fig:taxonomy} lays out the full structure.
+Three features of it matter for interpreting results by subject. CFA Levels~I and~II examine the
+same ten subjects at increasing depth, which gives the benchmark a controlled
+same-subject-deeper-treatment contrast that most examination corpora cannot offer. CFA Level~III
+replaces most of those subjects with the specialisation pathways introduced in the current
+curriculum, so it is a different territory rather than a harder version of the same one. And
+Ethical and Professional Standards is the only subject present at all three CFA levels,
+supplying $417$ items in total, which makes it the natural place to look for whether a system's
+professional judgment improves with the depth the curriculum expects.
+
+FRM is organised differently. Its two parts share no subject, Part~I covering foundations,
+quantitative analysis, markets and valuation, and Part~II covering the four risk classes plus
+the investment-management application. The nine FRM subjects are the complete set the
+examination defines, so unlike CFA the FRM subject coverage in \textsc{FinExam-10K} is exhaustive
+rather than a sample.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_taxonomy.pdf}
+\caption{Subject coverage of \textsc{FinExam-10K}. The five panels are the examination stages and
+the nodes within each are the curriculum subjects the examination body publishes for that stage,
+with the subject count and labelled item count given in each header. Thirty-seven nodes cover
+$26$ distinct subjects, because Levels~I and~II examine the same ten and Ethical and
+Professional Standards recurs at Level~III. Subjects are taken from the source metadata rather
+than assigned by us, and two spelling variants were merged. The $5{,}088$ labelled items are
+exactly the held-out half, since the public mock and practice half is tagged with paper
+identifiers rather than subjects, so this figure describes the composition of the held-out
+partition and not of the benchmark as a whole.}
+\label{fig:taxonomy}
+\end{figure*}

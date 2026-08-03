@@ -1,0 +1,17 @@
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_heatmap_subject.pdf}
+\caption{Chance-normalised accuracy of all $17$ systems on the $15$ curriculum subjects with at
+least $150$ labelled items. CFA and FRM are drawn as separate panels because the two examinations
+share no subject and use different option counts, and Acc$^{*}$ removes that difference by
+normalising each item against its own chance rate. Column headers give the item count, and rows are
+grouped by access mode then ordered by mean Acc$^{*}$. Two readings the aggregate leaderboard
+hides. First, ordering is not preserved across subjects: GPT-OSS-120B leads GPT-4o on thirteen of
+the fifteen but trails it on Ethical and Professional Standards and on Financial Statement
+Analysis. Second, the spread between best and worst system is itself subject-dependent, $20.5$
+points on Quantitative Analysis against $49.0$ on Ethical and Professional Standards, where the
+frontier systems exceed $89$ while the finance-specialized models sit in the twenties and forties.
+Subject labels exist only for the held-out half, so the figure describes that partition and covers
+$4{,}217$ items.}
+\label{fig:heatmap-subject}
+\end{figure*}

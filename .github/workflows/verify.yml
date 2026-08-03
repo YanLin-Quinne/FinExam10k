@@ -1,0 +1,51 @@
+name: verify
+
+# Runs on every push and pull request. The point is that the reproducibility claims in the README
+# are checked by machine rather than asserted by us. If this badge is not green, something in the
+# bundle is broken and the claims should not be believed.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: python -m pip install --quiet numpy scikit-learn matplotlib
+
+      - name: Every python file compiles
+        run: python -m compileall -q code tests
+
+      - name: Bundle self-test
+        run: python tests/test_bundle.py
+
+      - name: Deterministic gate inference on the public partition
+        run: python code/router/gate_infer.py
+
+      - name: Manifest is complete
+        run: |
+          python - <<'PY'
+          import hashlib, pathlib
+          root = pathlib.Path(".")
+          listed = set()
+          for line in pathlib.Path("MANIFEST.sha256").read_text().splitlines():
+              if line.strip():
+                  listed.add(line.split("  ", 1)[1])
+          on_disk = {
+              str(p) for p in root.rglob("*")
+              if p.is_file() and ".git" not in p.parts and "__pycache__" not in p.parts
+              and p.name != "MANIFEST.sha256"
+          }
+          missing = sorted(on_disk - listed)
+          assert not missing, f"{len(missing)} files are not in the manifest: {missing[:5]}"
+          print(f"manifest covers all {len(listed)} files")
+          PY

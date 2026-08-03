@@ -1,0 +1,73 @@
+% =====================================================================
+% RQ2 intervention outcomes, split into two single-column tables so
+% neither needs table* and the pair costs less vertical space than the
+% original two-panel table*.  Numbers unchanged from the cross-column
+% version.  Place them on the same page for the reader to compare.
+% =====================================================================
+
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.6pt}
+\renewcommand{\arraystretch}{1.06}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Method} & \textbf{Acc.} & \textbf{Resc.} & \textbf{Harm}
+& \textbf{$\Delta$} & \textbf{$p$} \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{CoT (DeepSeek-R1)}} \\
+Direct                      & 79.75 & --  & --  & --       & --    \\
+Function-RAG                & 79.43 & 505 & 538 & $-0.32$  & 0.322 \\
+FunctionGraph-RAG           & \textbf{79.84} & 509 & 500 & $+0.09$ & 0.801 \\
+\addlinespace[2pt]
+\textit{Oracle ceiling}     & 87.00 & 739 & 0   & $+7.25$  & n/a   \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{PoT (GPT-4o)}} \\
+Direct                      & \textbf{69.37} & --  & --  & --      & --      \\
+Function-RAG                & 68.09 & 427 & 557 & $-1.27$ & $<$0.001 \\
+FunctionGraph-RAG           & 68.06 & 527 & 660 & $-1.30$ & $<$0.001 \\
+\quad + Verifier            & 68.92 & 484 & 530 & $-0.45$ & 0.158   \\
+\addlinespace[2pt]
+\textit{Oracle ceiling}     & 76.83 & 761 & 0   & $+7.46$ & n/a     \\
+\bottomrule
+\end{tabular}
+\caption{Matched intervention outcomes on the full benchmark
+($N=10{,}198$). Rescue and Harm are item counts against the Direct
+baseline of the same chain, $\Delta$ is their difference as a percentage of $N$, and $p$ is a two-sided exact McNemar test. The oracle ceiling
+picks a correct branch post hoc wherever one exists, so it bounds a
+router rather than describing one.}
+\label{tab:rq2-full}
+\end{table}
+
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.6pt}
+\renewcommand{\arraystretch}{1.06}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Method} & \textbf{Acc.} & \textbf{Resc.} & \textbf{Harm}
+& \textbf{$\Delta$} & \textbf{$p$} \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{CoT (DeepSeek-R1)}} \\
+Direct                      & 90.64 & --  & --  & --      & --    \\
+Function-RAG                & 90.32 & 199 & 223 & $-0.31$ & 0.263 \\
+FunctionGraph-RAG           & \textbf{90.87} & 213 & 195 & $+0.24$ & 0.400 \\
+\addlinespace[2pt]
+\textit{Oracle ceiling}     & 94.39 & 286 & 0   & $+3.75$ & n/a   \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{PoT (GPT-4o)}} \\
+Direct                      & \textbf{80.60} & --  & --  & --      & --      \\
+Function-RAG                & 79.42 & 200 & 290 & $-1.18$ & $<$0.001 \\
+FunctionGraph-RAG           & 78.91 & 252 & 381 & $-1.69$ & $<$0.001 \\
+\quad + Verifier            & 80.20 & 233 & 264 & $-0.41$ & 0.178   \\
+\addlinespace[2pt]
+\textit{Oracle ceiling}     & 85.26 & 355 & 0   & $+4.66$ & n/a     \\
+\bottomrule
+\end{tabular}
+\caption{The same comparison restricted to the Context-Complete Subset,
+the $7{,}625$ items answerable from their own text. Columns and tests
+are as in Table~\ref{tab:rq2-full}. This subset is distinct from the
+$372$-item context-complete Hard diagnostic set.}
+\label{tab:rq2-cc}
+\end{table}
