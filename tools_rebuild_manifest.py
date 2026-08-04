@@ -23,6 +23,10 @@ SKIP_NAMES = {"MANIFEST.sha256", ".gitignore", ".DS_Store"}
 def is_release_content(rel: pathlib.Path) -> bool:
     if rel.parts[0] in SKIP_ROOTS or "__pycache__" in rel.parts:
         return False
+    # code/<pkg>/figures/ is a script's output directory. code/figures/ is source, so the
+    # check starts below the package level rather than matching the name anywhere.
+    if "figures" in rel.parts[2:-1]:
+        return False
     if rel.name in SKIP_NAMES or rel.suffix == ".pyc":
         return False
     # A .json written next to an analysis script is that script's output, not something we ship.
