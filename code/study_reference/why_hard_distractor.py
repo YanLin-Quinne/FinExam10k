@@ -1,27 +1,15 @@
-#!/usr/bin/env python3
-"""
-why_hard_distractor.py  ->  why_hard_distractor.json + why_hard_distractor_viz.json
+"""STUDY RECORD, NOT PART OF THE REPRODUCTION PATH.
 
-ANGLE: the mechanism of the shared wrong answer on FinExam-10K hard items.
-
-Every claim is contrastive. Three reference sets are carried through the whole script:
-  HARD90   hard band, >=90% of parsed wrong picks on ONE distractor  (the phenomenon)
-  EASY35   easy band, failed by 3-5 of 17 models                     (between-band control)
-  EASY90   EASY35 restricted to >=90% concentration                  (concentration-matched
-                                                                      control: removes the
-                                                                      selection on agreement)
-  PLACEBO  within-item: the runner-up (non-modal) distractor of the SAME item
-                                                                      (null rate for a
-                                                                      signature to fire on an
-                                                                      arbitrary wrong option)
-
-Context-complete and re-runnable.  Every number reported anywhere lands in the JSON.
+This script ran against the study working tree, over the full 10,198 item corpus and intermediate
+label files that are not part of the release. It cannot execute here and nothing in the
+reproduction path imports it. It ships because it is the distractor-level analysis of the hard band, run over intermediate per-option scratch files that were not released.
 """
 from __future__ import annotations
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -32,7 +20,7 @@ import re
 import statistics as st
 import sys
 
-SCRATCH = '<WORKDIR>'
+SCRATCH = 'STUDY_WORKING_TREE_NOT_RELEASED'
 sys.path.insert(0, SCRATCH)
 
 from models17 import load_all, GROUP_OF, LEVELS  # noqa: E402
@@ -354,7 +342,7 @@ def contrast_cont(name, x, y):
 # 1. load
 # ======================================================================================
 QS, R, NAMES = load_all()
-LAB = json.load(open(pathlib.Path(SCRATCH) / 'difficulty_v1.json'))['labels']
+LAB = PD.difficulty()
 NM = len(NAMES)
 
 rows = {}

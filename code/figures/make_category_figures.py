@@ -20,6 +20,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -34,7 +35,6 @@ import matplotlib.pyplot as plt                # noqa: E402
 import numpy as np                              # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
 OUT = HERE / "figures"
 OUT.mkdir(exist_ok=True)
 
@@ -105,6 +105,14 @@ def panel(ax, rows, title, total_items):
         if s:
             subj[s][r["difficulty"]] += 1
     order = sorted(subj, key=lambda s: -sum(subj[s].values()))
+    if len(order) < 3:
+        raise SystemExit(
+            "not enough labelled subjects to draw the subject heatmap.\n"
+            "On the released public partition the `category` field names the mock or "
+            "practice paper an item came from, not its curriculum subject. Curriculum "
+            "subject labels were applied to the held-out half, which is not released, "
+            "so this panel cannot be drawn here. Earlier panels in this script that do "
+            "not need subject labels have already been written to figures/.")
     y = np.arange(len(order))
     left = np.zeros(len(order))
     totals = [sum(subj[s].values()) for s in order]
@@ -139,7 +147,7 @@ def panel(ax, rows, title, total_items):
 
 
 def main() -> int:
-    data = json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))
+    data = list(PD.items().values())
     labelled = sum(1 for r in data if subject(r))
     print(f"带真实科目标签的题 {labelled}/{len(data)} = {labelled / len(data) * 100:.1f}%")
 

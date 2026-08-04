@@ -22,6 +22,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -41,7 +42,6 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from models14 import ok                                 # noqa: E402
 from models17 import GROUP_OF, load_all                 # noqa: E402
 
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
 OUT = pathlib.Path(__file__).resolve().parent / "figures"
 OUT.mkdir(exist_ok=True)
 MIN_ITEMS = 150
@@ -85,8 +85,7 @@ plt.rcParams.update({
 
 
 def main() -> int:
-    data = {r["id"]: r for r in
-            json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))}
+    data = PD.items()
     _, records, names = load_all()
 
     def subject(row):
@@ -101,6 +100,13 @@ def main() -> int:
         if s:
             by_subject[s].append(i)
     keep = {s: v for s, v in by_subject.items() if len(v) >= MIN_ITEMS}
+    if not keep:
+        raise SystemExit(
+            "no subject has enough labelled items to draw a column.\n"
+            "The `category` field on the released public partition names the mock or practice "
+            "paper an item came from, not its curriculum subject. Curriculum subject labels were "
+            "applied to the held-out half, which is not released, so this figure cannot be drawn "
+            "here. The figure as published, and the counts behind it, are described in the paper.")
     cfa = sorted((s for s in keep if data[keep[s][0]]["exam"] == "CFA"),
                  key=lambda s: -len(keep[s]))
     frm = sorted((s for s in keep if data[keep[s][0]]["exam"] == "FRM"),
@@ -109,7 +115,7 @@ def main() -> int:
     def astar(model, s):
         ids = keep[s]
         c = 1 / 3 if data[ids[0]]["exam"] == "CFA" else 1 / 4
-        a = sum(1 for i in ids if ok(records[model][i])) / len(ids)
+        a = sum(1 for i in ids if ok(records[model][i], i)) / len(ids)
         return (a - c) / (1 - c) * 100
 
     cols = cfa + frm

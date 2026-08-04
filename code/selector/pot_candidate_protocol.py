@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from typing import Any, Iterable
 
-from .core import canonical_hash
+try:
+    from .core import canonical_hash
+except ImportError as exc:                                  # pragma: no cover
+    from . import upstream_required
+    raise upstream_required("`core`") from exc
 
 
 FEATURE_NAMES = ("reciprocal_rank", "reciprocal_depth", "edge_weight", "degree_scale")

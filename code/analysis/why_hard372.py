@@ -19,6 +19,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -34,7 +35,6 @@ from models14 import ok, pred                       # noqa: E402
 from models17 import GROUP_OF, load_all             # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
 LETTERS = {"A", "B", "C", "D"}
 NUMERIC = re.compile(r"^[^A-Za-z]*[-+]?[\d,]+(\.\d+)?\s*(%|bp|bps|million|billion|x)?[^A-Za-z]*$")
 COMPUTE = re.compile(r"\b(closest to|calculate|compute|is most likely to be|value of|"
@@ -79,19 +79,26 @@ def null_max_share(k_options: int, n: int) -> float:
 
 
 def main() -> int:
-    data = {r["id"]: r for r in
-            json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))}
+    data = PD.items()
     qs, R, names = load_all()
-    lab = json.loads((HERE / "difficulty_v1.json").read_text(encoding="utf-8"))["labels"]
-    good = set(json.loads((HERE / "clean_partition.json").read_text(encoding="utf-8"))
-               ["answerable_ids"])
+    lab = PD.difficulty()
+    good = PD.answerable()
 
     hard = [q for q in qs if lab[q]["band"] == "hard"]
     s372 = sorted(q for q in hard if q in good)
     s1065 = sorted(q for q in hard if q not in good)
-    assert len(s372) == 372 and len(s1065) == 1065, (len(s372), len(s1065))
 
-    nsolve = {i: sum(1 for m in names if ok(R[m][i])) for i in s372}
+    # The paper's 372 and 1,065 are counts over all 10,198 items. This release carries the 5,110
+    # public ones, so the same two definitions select 138 and 721 here. The split is checked rather
+    # than assumed, because s_i is computed per item and the bands must therefore survive
+    # subsetting: every hard item is in exactly one of the two sets and nothing else is.
+    assert not (set(s372) & set(s1065))
+    assert len(s372) + len(s1065) == len(hard)
+    PD.scope_banner("context-complete hard items", len(s372), 372)
+    print(f"[scope] hard band here: {len(hard):,} items, {len(s372):,} context-complete "
+          f"and {len(s1065):,} not.\n")
+
+    nsolve = {i: sum(1 for m in names if ok(R[m][i], i)) for i in s372}
     print("零假设参考值，错误票均匀落在 gold 以外的选项上时的期望最大占比")
     for k in (3, 4):
         line = "   ".join(f"n={n} {null_max_share(k - 1, n):.3f}" for n in (9, 13, 17))
@@ -100,7 +107,7 @@ def main() -> int:
 
     # ------------------------------------------------------------------ 1
     print("=" * 92)
-    print("  1. 372 题上「有几个系统答对」的分布")
+    print(f"  1. {len(s372)} 题上「有几个系统答对」的分布")
     print("=" * 92)
     dist = collections.Counter(nsolve.values())
     cum = 0
@@ -108,8 +115,8 @@ def main() -> int:
         if dist[k]:
             cum += dist[k]
             bar = "#" * round(dist[k] / 3)
-            print(f"    {k:>2}/17 答对  {dist[k]:>4} 道  ({dist[k]/372*100:>5.1f}%)  "
-                  f"累计 {cum/372*100:>5.1f}%  {bar}")
+            print(f"    {k:>2}/17 答对  {dist[k]:>4} 道  ({dist[k]/len(s372)*100:>5.1f}%)  "
+                  f"累计 {cum/len(s372)*100:>5.1f}%  {bar}")
     print(f"\n    中位数 {statistics.median(nsolve.values()):.0f}/17 答对，"
           f"零解 {dist[0]} 道，仅 1 个系统答对 {dist[1]} 道")
 
@@ -159,20 +166,20 @@ def main() -> int:
             return "判断/辨析题"
         return "其他"
 
-    for label, subset in (("372 context-complete hard", s372),
-                          ("1,065 缺材料 hard", s1065),
+    for label, subset in ((f"{len(s372)} context-complete hard", s372),
+                          (f"{len(s1065)} 缺材料 hard", s1065),
                           ("全库", sorted(qs))):
         c = collections.Counter(qtype(data[i]) for i in subset)
         n = len(subset)
         line = "   ".join(f"{k} {v/n*100:.0f}%" for k, v in c.most_common())
         print(f"    {label:<26} {line}")
 
-    print("\n    372 题内部，按题型看 17 模型平均准确率")
+    print(f"\n    {len(s372)} 题内部，按题型看 17 模型平均准确率")
     for t in ("计算题（选项是数字）", "计算描述题", "判断/辨析题", "其他"):
         sub = [i for i in s372 if qtype(data[i]) == t]
         if len(sub) < 15:
             continue
-        acc = statistics.mean(sum(1 for i in sub if ok(R[m][i])) / len(sub) for m in names)
+        acc = statistics.mean(sum(1 for i in sub if ok(R[m][i], i)) / len(sub) for m in names)
         print(f"      {t:<20} n={len(sub):>4}   平均 {acc*100:>5.2f}%")
 
     # ------------------------------------------------------------------ 4
@@ -204,18 +211,18 @@ def main() -> int:
 
     # ------------------------------------------------------------------ 6
     print("\n" + "=" * 92)
-    print("  6. 这 372 道集中在哪些科目和级别")
+    print(f"  6. 这 {len(s372)} 道集中在哪些科目和级别")
     print("=" * 92)
     lv = collections.Counter(f"{data[i]['exam']} {data[i]['level']}" for i in s372)
     allv = collections.Counter(f"{data[i]['exam']} {data[i]['level']}" for i in qs)
-    print(f"    {'级别':<20}{'372 中':>10}{'占该级别':>12}{'全库占比':>12}{'富集倍数':>12}")
+    print(f"    {'级别':<20}{'本集合':>10}{'占该级别':>12}{'全库占比':>12}{'富集倍数':>12}")
     for k, v in lv.most_common():
         share = v / allv[k] * 100
         base = allv[k] / len(qs) * 100
         print(f"    {k:<20}{v:>10}{share:>11.2f}%{base:>11.2f}%"
-              f"{(v/372*100)/base:>11.2f}x")
+              f"{(v/len(s372)*100)/base:>11.2f}x")
 
-    out = {"n": 372, "n_solve_distribution": dict(sorted(dist.items())),
+    out = {"n": len(s372), "n_solve_distribution": dict(sorted(dist.items())),
            "null_max_share_n17": {"3_options": null_max_share(2, 17),
                              "4_options": null_max_share(3, 17)},
            "concentration": {"n_items": len(rows),

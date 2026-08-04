@@ -1,3 +1,12 @@
+"""STUDY RECORD, NOT PART OF THE REPRODUCTION PATH.
+
+This script ran during the study against the working tree, which held the full 10,198 item corpus
+and the raw per-condition inference shards. Neither is part of the release, so this file cannot
+execute here and is not imported by anything that can. It ships because the procedure it encodes is
+worth reading: it is the second red-team pass, which decoupled letter position from value position to test whether the difficulty signal was an artefact of option order.
+
+Nothing in `code/analysis`, `code/figures`, `code/selector` or `code/router` depends on this file.
+"""
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
@@ -7,7 +16,7 @@ import paths as PATHS  # 全部路径集中在 code/paths.py
 import json, math, re, sys, pathlib, collections
 import numpy as np
 from scipy import stats
-HERE = pathlib.Path('<WORKDIR>')
+HERE = pathlib.Path('STUDY_WORKING_TREE_NOT_RELEASED')
 sys.path.insert(0, str(HERE))
 exec(open(HERE/'redteam_surface.py').read().split('# =========================================================================\n# STEP 0')[0])
 

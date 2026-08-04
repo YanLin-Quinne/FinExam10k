@@ -7,14 +7,18 @@ import math
 from pathlib import Path
 from typing import Any
 
-from .core import canonical_hash
-from .graph_features import FEATURE_NAMES, FEATURE_SCHEMA_HASH, candidate_id, feature_vector
-from .label_graph_training import (
-    CANDIDATE_PROTOCOL, CANDIDATE_PROTOCOL_FINGERPRINT, LABEL_SEMANTICS,
-    SOURCE_COMMIT, SOURCE_DATASET, SOURCE_KIND, SOURCE_SPLITS, TRAINING_OBJECTIVE,
-    TRAINING_STATISTICS, reject_answer_or_outcome_supervision,
-    validate_candidate_protocol, validate_training_statistics,
-)
+try:
+    from .core import canonical_hash
+    from .graph_features import FEATURE_NAMES, FEATURE_SCHEMA_HASH, candidate_id, feature_vector
+    from .label_graph_training import (
+        CANDIDATE_PROTOCOL, CANDIDATE_PROTOCOL_FINGERPRINT, LABEL_SEMANTICS,
+        SOURCE_COMMIT, SOURCE_DATASET, SOURCE_KIND, SOURCE_SPLITS, TRAINING_OBJECTIVE,
+        TRAINING_STATISTICS, reject_answer_or_outcome_supervision,
+        validate_candidate_protocol, validate_training_statistics,
+    )
+except ImportError as exc:                                  # pragma: no cover
+    from . import upstream_required
+    raise upstream_required("`core`, `graph_features`, `label_graph_training`") from exc
 
 
 @dataclass(frozen=True)

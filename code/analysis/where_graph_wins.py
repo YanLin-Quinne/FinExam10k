@@ -24,6 +24,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -36,29 +37,14 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 HERE = pathlib.Path(__file__).resolve().parent
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
-PoT = pathlib.Path.home() / "Desktop" / "finexam-gpt4o-pot-four-experiments-20260801" / \
-      "runs" / "graph-pot"
-R1 = pathlib.Path.home() / "Desktop" / "finexam-deepseek-r1-cot-five-variants-20260801" / \
-     "results" / "canonical"
-DIRECT = pathlib.Path("<PATH>/Documents/New project 3/finexam-openai-eval/runs/openrouter")
 MOCK = re.compile(r"\b(mock|practice|session|exam\s+[a-d])\b", re.I)
 NUMERIC = re.compile(r"^[^A-Za-z]*[-+]?[\d,]+(\.\d+)?\s*(%|bp|bps|million|billion|x)?[^A-Za-z]*$")
 MIN_N = 60
 
 
-def load(path: pathlib.Path) -> dict[str, dict]:
-    out: dict[str, dict] = {}
-    rec = path.with_suffix(path.suffix + ".records")
-    if rec.is_dir():
-        for shard in rec.glob("*.json"):
-            v = json.loads(shard.read_text(encoding="utf-8"))
-            out[str(v["id"])] = v
-    for line in path.open(encoding="utf-8"):
-        if line.strip():
-            v = json.loads(line)
-            out.setdefault(str(v["id"]), v)
-    return out
+def load(shard: str) -> dict[str, dict]:
+    """Parsed predictions for one condition, keyed by item id."""
+    return PD.run(shard)
 
 
 def mcnemar(b: int, c: int) -> float:
@@ -82,22 +68,20 @@ def bh(ps: list[float]) -> list[float]:
 
 
 def main() -> int:
-    data = {r["id"]: r for r in
-            json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))}
-    lab = json.loads((HERE / "difficulty_v1.json").read_text(encoding="utf-8"))["labels"]
-    good = set(json.loads((HERE / "clean_partition.json").read_text(encoding="utf-8"))
-               ["answerable_ids"])
+    data = PD.items()
+    lab = PD.difficulty()
+    good = PD.answerable()
     gold = {i: data[i]["answer"].strip().upper() for i in data}
 
     chains = {
         "PoT (GPT-4o)": {
-            "direct": load(DIRECT / "gpt4o-direct-pot-full-10198.jsonl"),
-            "function": load(PoT / "gpt4o-bupt-table5-official-full-10198.jsonl"),
-            "graph": load(PoT / "gpt4o-learned-graph-full-10198.jsonl")},
+            "direct": load("gpt4o-direct-pot-full-10198.jsonl"),
+            "function": load("gpt4o-bupt-table5-official-full-10198.jsonl"),
+            "graph": load("gpt4o-learned-graph-full-10198.jsonl")},
         "CoT (DeepSeek-R1)": {
-            "direct": load(R1 / "deepseek_r1_baseline_mcq.jsonl"),
-            "function": load(R1 / "deepseek_r1_fr_llm_instruct_judge_function_rag_mcq.jsonl"),
-            "graph": load(R1 / "deepseek_r1_fr_all_learned_graph_rag_mcq.jsonl")},
+            "direct": load("deepseek_r1_baseline_mcq.jsonl"),
+            "function": load("deepseek_r1_fr_llm_instruct_judge_function_rag_mcq.jsonl"),
+            "graph": load("deepseek_r1_fr_all_learned_graph_rag_mcq.jsonl")},
     }
     fn_pot = chains["PoT (GPT-4o)"]["function"]
 
@@ -124,7 +108,10 @@ def main() -> int:
     from models14 import ok as _ok                                    # noqa: E402
     from models17 import load_all as _load_all                        # noqa: E402
     _qs, _R, _names = _load_all()
-    zero = sorted(q for q in _qs if not any(_ok(_R[m][q]) for m in _names))
+    zero = sorted(q for q in _qs if not any(_ok(_R[m][q], q) for m in _names))
+    assert len(zero) == len(PD.zero_solve()), (
+        f"zero-solve recomputed here gives {len(zero)}, the shipped diagnostic file lists "
+        f"{len(PD.zero_solve())}. One of the two is stale.")
     slices.append(("Z188 zero-solve by all 17", zero))
     slices.append(("Z188 AND context-complete", [i for i in zero if i in good]))
     slices.append(("Z188 AND context-missing", [i for i in zero if i not in good]))

@@ -1,5 +1,8 @@
-"""Independent re-derivation / adversarial audit of why_hard_taxonomy claims.
-Does NOT import why_hard_taxonomy.py. Own stats implementations.
+"""STUDY RECORD, NOT PART OF THE REPRODUCTION PATH.
+
+This script ran against the study working tree, over the full 10,198 item corpus and intermediate
+label files that are not part of the release. It cannot execute here and nothing in the
+reproduction path imports it. It ships because the taxonomy red-team pass it encodes is what the appendix's robustness claims rest on, and the procedure should be readable.
 """
 
 import sys, pathlib
@@ -11,7 +14,7 @@ from collections import Counter, defaultdict
 import numpy as np
 from scipy import stats
 
-HERE = '<WORKDIR>'
+HERE = 'STUDY_WORKING_TREE_NOT_RELEASED'
 
 ITEMS = [json.loads(l) for l in open(HERE + 'finexam10k_labeled/finexam10k_all_10198_labeled.jsonl')]
 LAB = json.load(open(HERE + 'difficulty_v1.json'))['labels']

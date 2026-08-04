@@ -61,7 +61,7 @@ TRUNC_VARIANTS = [(3, 60), (5, 60), (5, 80), (5, 10 ** 9), (8, 60)]
 
 OUT = HERE / 'why_hard_taxonomy.json'
 VIZ = HERE / 'why_hard_taxonomy_viz.json'
-LABELS_PATH = HERE / 'difficulty_v1.json'
+LABELS_PATH = PATHS.DIFFICULTY
 
 
 # ----------------------------------------------------------------- statistics
@@ -234,7 +234,7 @@ def build():
         q = QS[qid]
         txt = item_text(q)
         stem = clean_text(q.get('content'))
-        n_correct = sum(1 for m in NAMES if ok(R[m][qid]))
+        n_correct = sum(1 for m in NAMES if ok(R[m][qid], qid))
         n_empty = sum(1 for m in NAMES if pred(R[m][qid]) == '')
         ftags = formula_tags(txt)
         otags = operation_tags(txt)
@@ -956,8 +956,8 @@ def main():
     accB = {}
     for r in rows:
         qid = r['id']
-        accA[qid] = sum(1 for m in A if ok(R[m][qid])) / len(A)
-        accB[qid] = sum(1 for m in B if ok(R[m][qid])) / len(B)
+        accA[qid] = sum(1 for m in A if ok(R[m][qid], qid)) / len(A)
+        accB[qid] = sum(1 for m in B if ok(R[m][qid], qid)) / len(B)
     thrA = float(np.quantile([accA[r['id']] for r in rows], base_rate))
     for r in rows:
         r['hardA'] = 1 if accA[r['id']] <= thrA else 0

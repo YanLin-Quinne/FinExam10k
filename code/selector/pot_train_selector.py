@@ -5,11 +5,15 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .core import canonical_hash
-from .graph_features import FEATURE_NAMES, FEATURE_SCHEMA_HASH, candidate_id, feature_vector
-from .graph_training import _accuracy, _atomic_write, _load_id_manifest, _probability, _split
-from .retrieval import (BUPT_REPO_COMMIT, CONTRIEVER_MODEL_ID,
-                        CONTRIEVER_REVISION)
+try:
+    from .core import canonical_hash
+    from .graph_features import FEATURE_NAMES, FEATURE_SCHEMA_HASH, candidate_id, feature_vector
+    from .graph_training import _accuracy, _atomic_write, _load_id_manifest, _probability, _split
+    from .retrieval import (BUPT_REPO_COMMIT, CONTRIEVER_MODEL_ID,
+                            CONTRIEVER_REVISION)
+except ImportError as exc:                                  # pragma: no cover
+    from . import upstream_required
+    raise upstream_required("`core`, `graph_features`, `graph_training`, `retrieval`") from exc
 
 
 SOURCE_DATASET = "BUPT FinanceReasoning"

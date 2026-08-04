@@ -19,6 +19,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import json
@@ -31,29 +32,14 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 HERE = pathlib.Path(__file__).resolve().parent
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
-R1 = pathlib.Path.home() / "Desktop" / "finexam-deepseek-r1-cot-five-variants-20260801" / \
-     "results" / "canonical"
-PoT = pathlib.Path.home() / "Desktop" / "finexam-gpt4o-pot-four-experiments-20260801" / \
-      "runs" / "graph-pot"
-DIRECT = pathlib.Path("<PATH>/Documents/New project 3/finexam-openai-eval/runs/openrouter")
 LETTERS = {"A", "B", "C", "D"}
 B = 5000
 SEED = 202607
 
 
-def load(path: pathlib.Path) -> dict[str, str]:
-    out: dict[str, str] = {}
-    rec = path.with_suffix(path.suffix + ".records")
-    if rec.is_dir():
-        for shard in rec.glob("*.json"):
-            v = json.loads(shard.read_text(encoding="utf-8"))
-            out[str(v["id"])] = str(v.get("prediction") or "").strip().upper()
-    for line in path.open(encoding="utf-8"):
-        if line.strip():
-            v = json.loads(line)
-            out.setdefault(str(v["id"]), str(v.get("prediction") or "").strip().upper())
-    return out
+def load(shard: str) -> dict[str, dict]:
+    """Parsed predictions for one condition, keyed by item id."""
+    return PD.run(shard)
 
 
 def mcnemar_exact(b: int, c: int) -> float:
@@ -103,22 +89,21 @@ def chain(name, conditions, items, gold, rng):
 
 
 def main() -> int:
-    data = {r["id"]: r for r in
-            json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))}
-    part = json.loads((HERE / "clean_partition.json").read_text(encoding="utf-8"))
+    data = PD.items()
+    part = {"answerable_ids": sorted(PD.answerable())}
     good = set(part["answerable_ids"])
     items = sorted(i for i in data if data[i]["difficulty"] == "hard" and i in good)
     gold = {i: data[i]["answer"].strip().upper() for i in items}
     rng = random.Random(SEED)
 
     chain("CoT chain, DeepSeek-R1", {
-        "Direct CoT": load(R1 / "deepseek_r1_baseline_mcq.jsonl"),
-        "Function-RAG (BM25)": load(R1 / "deepseek_r1_function_rag_mcq.jsonl"),
-        "Function-RAG (BUPT)": load(R1 / "deepseek_r1_fr_llm_instruct_judge_function_rag_mcq.jsonl"),
-        "FunctionGraph-RAG (learned)": load(R1 / "deepseek_r1_fr_all_learned_graph_rag_mcq.jsonl"),
+        "Direct CoT": load("deepseek_r1_baseline_mcq.jsonl"),
+        "Function-RAG (BM25)": load("deepseek_r1_function_rag_mcq.jsonl"),
+        "Function-RAG (BUPT)": load("deepseek_r1_fr_llm_instruct_judge_function_rag_mcq.jsonl"),
+        "FunctionGraph-RAG (learned)": load("deepseek_r1_fr_all_learned_graph_rag_mcq.jsonl"),
     }, items, gold, rng)
 
-    informed = dict(load(PoT / "gpt4o-bupt-table5-official-full-10198.jsonl"))
+    informed = dict(load("gpt4o-bupt-table5-official-full-10198.jsonl"))
     path = HERE / "exp4b-informed-verifier.jsonl"
     if path.exists():
         for line in path.open(encoding="utf-8"):
@@ -128,10 +113,10 @@ def main() -> int:
                     informed[str(v["id"])] = v["verifier_answer"]
 
     chain("PoT chain, GPT-4o", {
-        "Direct PoT": load(DIRECT / "gpt4o-direct-pot-full-10198.jsonl"),
-        "Function-RAG (BUPT)": load(PoT / "gpt4o-bupt-table5-official-full-10198.jsonl"),
-        "FunctionGraph-RAG (learned)": load(PoT / "gpt4o-learned-graph-full-10198.jsonl"),
-        "Verifier (specified)": load(PoT / "gpt4o-graph-verifier-full-10198.jsonl"),
+        "Direct PoT": load("gpt4o-direct-pot-full-10198.jsonl"),
+        "Function-RAG (BUPT)": load("gpt4o-bupt-table5-official-full-10198.jsonl"),
+        "FunctionGraph-RAG (learned)": load("gpt4o-learned-graph-full-10198.jsonl"),
+        "Verifier (specified)": load("gpt4o-graph-verifier-full-10198.jsonl"),
         "Verifier (informed)": informed,
     }, items, gold, rng)
 

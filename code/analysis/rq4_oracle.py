@@ -19,6 +19,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -26,11 +27,6 @@ import json
 import pathlib
 import statistics
 
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
-R1 = pathlib.Path.home() / "Desktop" / "finexam-deepseek-r1-cot-five-variants-20260801" / \
-     "results" / "canonical"
-PoT = pathlib.Path.home() / "Desktop" / "finexam-gpt4o-pot-four-experiments-20260801" / \
-      "runs" / "graph-pot"
 
 R1_ARMS = [
     ("R1 direct CoT", "deepseek_r1_baseline_mcq.jsonl"),
@@ -39,42 +35,31 @@ R1_ARMS = [
     ("R1 learned FunctionGraph-RAG + judge", "deepseek_r1_fr_all_learned_graph_rag_mcq.jsonl"),
     ("R1 FunctionGraph-RAG top-10, no judge", "deepseek_r1_graph_rag_fr_all_mcq.jsonl"),
 ]
-DIRECT = pathlib.Path("<PATH>/Documents/New project 3/finexam-openai-eval/runs/openrouter")
 INFORMED = pathlib.Path(__file__).resolve().parent / "exp4b-informed-verifier.jsonl"
 PoT_ARMS = [
-    ("4o direct PoT", DIRECT / "gpt4o-direct-pot-full-10198.jsonl"),
-    ("4o function-RAG PoT", PoT / "gpt4o-bupt-table5-official-full-10198.jsonl"),
-    ("4o learned FunctionGraph-RAG PoT", PoT / "gpt4o-learned-graph-full-10198.jsonl"),
-    ("4o FunctionGraph-RAG + verifier (specified)", PoT / "gpt4o-graph-verifier-full-10198.jsonl"),
+    ("4o direct PoT", "gpt4o-direct-pot-full-10198.jsonl"),
+    ("4o function-RAG PoT", "gpt4o-bupt-table5-official-full-10198.jsonl"),
+    ("4o learned FunctionGraph-RAG PoT", "gpt4o-learned-graph-full-10198.jsonl"),
+    ("4o FunctionGraph-RAG + verifier (specified)", "gpt4o-graph-verifier-full-10198.jsonl"),
 ]
 LETTERS = {"A", "B", "C", "D"}
 
 
-def load_jsonl(path: pathlib.Path) -> dict[str, str]:
+def load_jsonl(shard: str) -> dict[str, str]:
     """id -> predicted letter, empty string when nothing parsable came back."""
-    out: dict[str, str] = {}
-    records = path.with_suffix(path.suffix + ".records")
-    if records.is_dir():
-        for shard in records.glob("*.json"):
-            value = json.loads(shard.read_text(encoding="utf-8"))
-            out[str(value["id"])] = str(value.get("prediction") or "").strip().upper()
-    for line in path.open(encoding="utf-8"):
-        if line.strip():
-            value = json.loads(line)
-            out.setdefault(str(value["id"]), str(value.get("prediction") or "").strip().upper())
-    return out
+    return {i: str(v.get("prediction") or "").strip().upper()
+            for i, v in PD.run(shard).items()}
 
 
 def main() -> int:
-    data = {r["id"]: r for r in
-            json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))}
+    data = PD.items()
     items = sorted(data)
     gold = {i: data[i]["answer"].strip().upper() for i in items}
     chance = {i: 1 / 3 if data[i]["exam"] == "CFA" else 1 / 4 for i in items}
 
     preds: dict[str, dict[str, str]] = {}
     for name, fname in R1_ARMS:
-        preds[name] = load_jsonl(R1 / fname)
+        preds[name] = load_jsonl(fname)
     for name, path in PoT_ARMS:
         preds[name] = load_jsonl(path)
     # informed 验证器只在两种做法冲突的 1,392 题上触发，其余题沿用 function-RAG 的答案

@@ -12,6 +12,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -26,12 +27,6 @@ import numpy as np                             # noqa: E402
 from matplotlib.patches import Patch           # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
-R1 = pathlib.Path.home() / "Desktop" / "finexam-deepseek-r1-cot-five-variants-20260801" / \
-     "results" / "canonical"
-PoT = pathlib.Path.home() / "Desktop" / "finexam-gpt4o-pot-four-experiments-20260801" / \
-      "runs" / "graph-pot"
-DIRECT = pathlib.Path("<PATH>/Documents/New project 3/finexam-openai-eval/runs/openrouter")
 OUT = HERE / "figures"
 OUT.mkdir(exist_ok=True)
 
@@ -53,24 +48,15 @@ R1_ARMS = [("Direct CoT", "deepseek_r1_baseline_mcq.jsonl"),
            ("LLM-instructed + judge", "deepseek_r1_fr_llm_instruct_judge_function_rag_mcq.jsonl"),
            ("Learned FunctionGraph-RAG + judge", "deepseek_r1_fr_all_learned_graph_rag_mcq.jsonl"),
            ("FunctionGraph-RAG top-10, no judge", "deepseek_r1_graph_rag_fr_all_mcq.jsonl")]
-PoT_ARMS = [("Direct PoT", DIRECT / "gpt4o-direct-pot-full-10198.jsonl"),
-            ("Function-RAG PoT", PoT / "gpt4o-bupt-table5-official-full-10198.jsonl"),
-            ("Learned FunctionGraph-RAG PoT", PoT / "gpt4o-learned-graph-full-10198.jsonl"),
-            ("Verifier, as specified", PoT / "gpt4o-graph-verifier-full-10198.jsonl")]
+PoT_ARMS = [("Direct PoT", "gpt4o-direct-pot-full-10198.jsonl"),
+            ("Function-RAG PoT", "gpt4o-bupt-table5-official-full-10198.jsonl"),
+            ("Learned FunctionGraph-RAG PoT", "gpt4o-learned-graph-full-10198.jsonl"),
+            ("Verifier, as specified", "gpt4o-graph-verifier-full-10198.jsonl")]
 
 
-def load(path: pathlib.Path) -> dict[str, str]:
-    out: dict[str, str] = {}
-    rec = path.with_suffix(path.suffix + ".records")
-    if rec.is_dir():
-        for shard in rec.glob("*.json"):
-            v = json.loads(shard.read_text(encoding="utf-8"))
-            out[str(v["id"])] = str(v.get("prediction") or "").strip().upper()
-    for line in path.open(encoding="utf-8"):
-        if line.strip():
-            v = json.loads(line)
-            out.setdefault(str(v["id"]), str(v.get("prediction") or "").strip().upper())
-    return out
+def load(shard: str) -> dict[str, dict]:
+    """Parsed predictions for one condition, keyed by item id."""
+    return PD.run(shard)
 
 
 def save(fig, stem: str) -> None:
@@ -81,14 +67,13 @@ def save(fig, stem: str) -> None:
 
 
 def main() -> int:
-    data = {r["id"]: r for r in
-            json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))}
+    data = PD.items()
     items = sorted(data)
     gold = {i: data[i]["answer"].strip().upper() for i in items}
 
     preds: dict[str, dict[str, str]] = {}
     for label, f in R1_ARMS:
-        preds[f"R1 {label}"] = load(R1 / f)
+        preds[f"R1 {label}"] = load(f)
     for label, p in PoT_ARMS:
         preds[f"4o {label}"] = load(p)
     informed = HERE / "exp4b-informed-verifier.jsonl"
@@ -173,9 +158,9 @@ def main() -> int:
     cot_all = set.intersection(*[wrongsets[k] for k in fam["CoT"]])
     pot_all = set.intersection(*[wrongsets[k] for k in fam["PoT"]])
     both = cot_all & pot_all
-    part = json.loads((HERE / "clean_partition.json").read_text(encoding="utf-8"))
+    part = {"answerable_ids": sorted(PD.answerable())}
     answerable = set(part["answerable_ids"])
-    bands = part["rebuilt_bands"]
+    bands = {i: v["band"] for i, v in PD.difficulty().items()}
     combos = [("Failed by every\nCoT condition", cot_all), ("Failed by every\nPoT condition", pot_all),
               ("Failed by both\nfamilies", both),
               ("Both, and\nanswerable", both & answerable)]
@@ -198,7 +183,9 @@ def main() -> int:
     # ------------------------------------------------------------- sandbox rejection
     print("figure: sandbox rejection")
     counts: dict[int, list[int]] = collections.defaultdict(lambda: [0, 0])
-    d = PoT / "gpt4o-bupt-table5-official-full-10198.private"
+    # Per-item stage records carry the selected candidate ids and the sandbox verdict. They are not
+    # part of the release, so this panel is skipped rather than drawn from nothing.
+    d = PATHS.DATA / "selector" / "pot_stage_records"
     if d.is_dir():
         for shard in d.glob("*.json"):
             if shard.name.startswith("_"):
@@ -218,6 +205,10 @@ def main() -> int:
             counts[min(n, 3)][0] += 1
             counts[min(n, 3)][1] += status != "ok"
     ks = sorted(counts)
+    if not ks:
+        print("  skipping the sandbox panel: per-item stage records are not released, "
+              "so there is no sandbox verdict to count.")
+        return 0
     rate = [counts[k][1] / counts[k][0] * 100 for k in ks]
     fig, ax = plt.subplots(figsize=(5.0, 3.0))
     ax.bar(ks, rate, 0.55, color=["#5B9E6B"] + ["#C4574E"] * (len(ks) - 1),

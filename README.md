@@ -226,29 +226,54 @@ carry a banner saying so, and nothing in the reproduction path imports them.
 ## Installation
 
 ```
-python -m pip install numpy scikit-learn matplotlib
+python -m pip install -r requirements.txt
 ```
 
-Python 3.11. No GPU is needed for anything here, because the bundle ships predictions rather than
-weights and no inference is rerun.
+Python 3.11, versions pinned. No GPU is needed for anything here, because the bundle ships
+predictions rather than weights and no inference is rerun.
 
 ## Quick start
 
+Start here, which compiles everything, runs the 22-assertion self-test, and then executes each
+command below:
+
+```
+bash run_tests.sh
+```
+
+The same commands individually:
+
 ```
 cd code/analysis
-
 python why_hard372.py          # error concentration against an exact per-item null
 python where_graph_wins.py     # 220-test slice sweep, Benjamini-Hochberg corrected
 python rq2_error_analysis.py   # rescue and harm decomposition per retrieval condition
-python make_router_table.py    # the routing table
+
+cd ../router
+python gate_infer.py           # the frozen gate, deterministic, prints a decision-vector sha256
 
 cd ../figures
-python make_heatmap_subject.py # subject heatmap, writes ../../figures/
 python make_taxonomy_figure.py # curriculum taxonomy
 ```
 
-Every script prints the item count it actually ran on. Bootstrap and cross-validation use seed
-202607, fixed in the scripts, so runs are deterministic.
+CI runs exactly these on every push, from a clean checkout, so a command that stops working fails
+visibly rather than waiting to be found by a reader.
+
+Every script prints a scope line naming the partition and the item count it actually ran on.
+Bootstrap and cross-validation use seed 202607, fixed in the scripts, and repeated runs of
+`gate_infer.py` produce a byte-identical decision vector.
+
+**These recompute over the public partition, not the full corpus.** The paper reports over all
+10,198 items; this release carries the 5,110 public ones, so the same definitions select
+proportionally smaller sets. The 372 context-complete Hard items become 138 here, and the 188
+zero-solve items become 118. The scope line makes this visible on every run. Subsetting is sound
+because the difficulty score is computed per item, so restricting the file selects a subset of each
+band rather than recomputing the bands.
+
+Some scripts in `code/` deliberately do not run here: the held-out router evaluation, the
+curriculum-subject figures, and the program-of-thought selector's upstream retrieval stack. Each
+stops with a message explaining why and pointing at what ships instead. `REPRODUCIBILITY.md`
+lists them.
 
 ## What will not reproduce, and why
 
@@ -257,7 +282,7 @@ the public partition and scored once on the 5,088 held-out items, and the held-o
 not released. That separation is what makes the leaderboard protocol worth anything, so the gap is
 deliberate rather than an oversight. The routing code ships in full so the protocol can be
 inspected: `code/analysis/router_gate.py` is the configuration reported in the paper, and
-`code/analysis/router.py` with `code/rag_variants/router_v2.py` are the variants evaluated
+`code/analysis/router.py` with `code/rag_variants/router_per_condition.py` are the variants evaluated
 alongside it. Selection among the four used out-of-fold accuracy inside the public partition,
 never held-out accuracy.
 

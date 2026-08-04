@@ -27,6 +27,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -45,10 +46,6 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import router as RT                                    # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
-PoT = pathlib.Path.home() / "Desktop" / "finexam-gpt4o-pot-four-experiments-20260801" / \
-      "runs" / "graph-pot"
-DIRECT = pathlib.Path("<PATH>/Documents/New project 3/finexam-openai-eval/runs/openrouter")
 PUBLIC = "public_mock_practice"
 SEED = 202607
 LETTERS = {"A", "B", "C", "D"}
@@ -77,13 +74,11 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
 
 
 def main() -> int:
-    data = {r["id"]: r for r in
-            json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))}
+    data = PD.items()
     gold = {i: data[i]["answer"].strip().upper() for i in data}
-    good = set(json.loads((HERE / "clean_partition.json").read_text(encoding="utf-8"))
-               ["answerable_ids"])
-    direct = RT.load_records(DIRECT / "gpt4o-direct-pot-full-10198.jsonl")
-    graph = RT.load_records(PoT / "gpt4o-learned-graph-full-10198.jsonl")
+    good = PD.answerable()
+    direct = RT.load_records("gpt4o-direct-pot-full-10198.jsonl")
+    graph = RT.load_records("gpt4o-learned-graph-full-10198.jsonl")
 
     def ok(rec, i):
         return str(rec.get(i, {}).get("prediction") or "").strip().upper() == gold[i]
@@ -91,6 +86,15 @@ def main() -> int:
     items = sorted(data)
     pub = [i for i in items if data[i]["publication_split"] == PUBLIC]
     held = [i for i in items if data[i]["publication_split"] != PUBLIC]
+    if not held:
+        raise SystemExit(
+            "no held-out items are present, so there is nothing to score.\n"
+            "This script fits on the public partition and evaluates on the held-out partition, "
+            "which is not released. What ships instead is the frozen gate and a deterministic "
+            "inference script: run `python code/router/gate_infer.py` to reproduce the routing "
+            "decisions on the public partition, and compare its decision-vector hash against "
+            "data/router/heldout_decision_manifest.json to verify the held-out evaluation "
+            "without the items being exposed.")
     PUB_SET, HELD_SET = set(pub), set(held)
     print(f"开发集（公开半）{len(pub)}   测试集（隐藏半）{len(held)}\n")
 

@@ -34,7 +34,7 @@ def band(score: float, hi: float = 2 / 3, lo: float = 1 / 3) -> str:
 
 def rule_a(records, names, item):
     """Flat average over all seventeen systems."""
-    return sum(1 for n in names if ok(records[n][item])) / len(names)
+    return sum(1 for n in names if ok(records[n][item], item)) / len(names)
 
 
 def rule_b(records, names, item):
@@ -43,14 +43,14 @@ def rule_b(records, names, item):
               [n for n in names if n not in API and n not in FINANCE],
               [n for n in names if n in FINANCE]]
     groups = [g for g in groups if g]
-    return sum(sum(1 for n in g if ok(records[n][item])) / len(g) for g in groups) / len(groups)
+    return sum(sum(1 for n in g if ok(records[n][item], item)) / len(g) for g in groups) / len(groups)
 
 
 def rule_c(records, names, item):
     """Two groups, equally weighted: API-served against single-accelerator."""
     groups = [[n for n in names if n in API], [n for n in names if n not in API]]
     groups = [g for g in groups if g]
-    return sum(sum(1 for n in g if ok(records[n][item])) / len(g) for g in groups) / len(groups)
+    return sum(sum(1 for n in g if ok(records[n][item], item)) / len(g) for g in groups) / len(groups)
 
 
 def spearman(x, y):
@@ -118,8 +118,8 @@ def main() -> int:
     print("\n=== 信度 ===")
     half1 = sorted(names)[::2]
     half2 = [n for n in sorted(names) if n not in half1]
-    s1 = [sum(1 for n in half1 if ok(records[n][i])) / len(half1) for i in items]
-    s2 = [sum(1 for n in half2 if ok(records[n][i])) / len(half2) for i in items]
+    s1 = [sum(1 for n in half1 if ok(records[n][i], i)) / len(half1) for i in items]
+    s2 = [sum(1 for n in half2 if ok(records[n][i], i)) / len(half2) for i in items]
     r = spearman(s1, s2)
     print(f"  分半信度 Spearman {r:.4f}   Spearman-Brown 校正后 {2 * r / (1 + r):.4f}")
     print(f"    （半组 1：{len(half1)} 个模型，半组 2：{len(half2)} 个）")

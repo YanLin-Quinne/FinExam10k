@@ -19,6 +19,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -118,7 +119,7 @@ def rate_ratio(k1: int, n1: int, k2: int, n2: int) -> dict:
 # load
 # --------------------------------------------------------------------------------------
 QS, R, NAMES = load_all()
-LAB = json.load(open(HERE / 'difficulty_v1.json'))['labels']
+LAB = PD.difficulty()
 BAND = {q: LAB[q]['band'] for q in QS}
 HARD = sorted(q for q in QS if BAND[q] == 'hard')
 EASY = sorted(q for q in QS if BAND[q] == 'easy')
@@ -127,7 +128,7 @@ CHANCE = {q: (1.0 / len(QS[q]['options'])) for q in QS}
 
 
 def n_correct(qid: str) -> int:
-    return sum(1 for m in NAMES if ok(R[m][qid]))
+    return sum(1 for m in NAMES if ok(R[m][qid], qid))
 
 
 def acc_of(ids) -> float:
@@ -369,13 +370,13 @@ all_unres = [q for q in QS if UNRES[q]]
 all_res = [q for q in QS if not UNRES[q]]
 per_model = []
 for m in NAMES:
-    au = sum(1 for q in all_unres if ok(R[m][q])) / len(all_unres)
-    ar = sum(1 for q in all_res if ok(R[m][q])) / len(all_res)
+    au = sum(1 for q in all_unres if ok(R[m][q], q)) / len(all_unres)
+    ar = sum(1 for q in all_res if ok(R[m][q], q)) / len(all_res)
     per_model.append({'model': m, 'group': GROUP_OF[m], 'acc_unresolved': au, 'acc_resolved': ar,
                       'delta': au - ar, 'cohens_h': cohens_h(au, ar)})
 w = stats.wilcoxon([d['acc_unresolved'] for d in per_model], [d['acc_resolved'] for d in per_model])
-_e = sum(1 for q in all_unres for m in NAMES if ok(R[m][q]))
-_ne = sum(1 for q in all_res for m in NAMES if ok(R[m][q]))
+_e = sum(1 for q in all_unres for m in NAMES if ok(R[m][q], q))
+_ne = sum(1 for q in all_res for m in NAMES if ok(R[m][q], q))
 SELECTION_CONTROL = {
     'design': 'whole benchmark, no band used; unresolved-context is a text-only label; 17 paired '
               'per-model accuracies',

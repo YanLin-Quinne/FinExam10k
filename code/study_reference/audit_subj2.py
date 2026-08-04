@@ -1,13 +1,22 @@
+"""STUDY RECORD, NOT PART OF THE REPRODUCTION PATH.
+
+This script ran during the study against the working tree, which held the full 10,198 item corpus
+and the raw per-condition inference shards. Neither is part of the release, so this file cannot
+execute here and is not imported by anything that can. It ships because the procedure it encodes is
+worth reading: it is the second subject-label audit.
+
+Nothing in `code/analysis`, `code/figures`, `code/selector` or `code/router` depends on this file.
+"""
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 #!/usr/bin/env python3
 """Step 2: reconstruct the canonical subject normalisation used by
 reports/dataset_category_inventory.csv, then redo per-subject stats."""
 import json, pathlib, collections, csv, re
 
-ROOT = pathlib.Path('<PATH>/Documents/New project 3/finexam-10k-research')
 
 # --- raw dataset shards (authoritative category/exam/level) ---
 shards = {}
@@ -21,13 +30,9 @@ print('dataset records:', len(shards))
 print('shard field keys:', sorted(next(iter(shards.values())).keys()))
 
 # --- r1 conditions ---
-def load(p):
-    d = {}
-    for line in p.open(encoding='utf-8'):
-        line=line.strip()
-        if line:
-            r=json.loads(line); d[str(r['id'])]=r
-    return d
+def load(shard: str) -> dict[str, dict]:
+    """Parsed predictions for one condition, keyed by item id."""
+    return PD.run(shard)
 R1 = ROOT/'results/r1/canonical'
 A = {
  'graph':    load(R1/'deepseek_r1_fr_all_learned_graph_rag_mcq.jsonl'),
@@ -76,4 +81,4 @@ subj = {i: canon(raw_cat[i]) for i in subj_ids}
 print('\ndistinct canonical subjects:', len(set(subj.values())))
 for s, n in collections.Counter(subj.values()).most_common():
     print(f'  {s:56s} {n}')
-json.dump({'subject_of': subj}, open('<WORKDIR>','w'))
+json.dump({'subject_of': subj}, open('STUDY_WORKING_TREE_NOT_RELEASED','w'))

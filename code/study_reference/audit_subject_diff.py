@@ -1,6 +1,16 @@
+"""STUDY RECORD, NOT PART OF THE REPRODUCTION PATH.
+
+This script ran during the study against the working tree, which held the full 10,198 item corpus
+and the raw per-condition inference shards. Neither is part of the release, so this file cannot
+execute here and is not imported by anything that can. It ships because the procedure it encodes is
+worth reading: it diffs subject labels between two curation rounds.
+
+Nothing in `code/analysis`, `code/figures`, `code/selector` or `code/router` depends on this file.
+"""
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 #!/usr/bin/env python3
 """Independent recomputation of subject-level and difficulty-level breakdowns.
@@ -8,7 +18,6 @@ Read-only. No repo files modified."""
 import json, pathlib, collections, math
 from scipy import stats
 
-ROOT = pathlib.Path('<PATH>/Documents/New project 3/finexam-10k-research')
 R1 = ROOT / 'results/r1/canonical'
 
 CONDITIONS = {
@@ -17,14 +26,9 @@ CONDITIONS = {
     'baseline': R1 / 'deepseek_r1_baseline_mcq.jsonl',
 }
 
-def load(p):
-    d = {}
-    for line in p.open(encoding='utf-8'):
-        line = line.strip()
-        if not line: continue
-        r = json.loads(line)
-        d[str(r['id'])] = r
-    return d
+def load(shard: str) -> dict[str, dict]:
+    """Parsed predictions for one condition, keyed by item id."""
+    return PD.run(shard)
 
 A = {k: load(v) for k, v in CONDITIONS.items()}
 for k, v in A.items():
@@ -114,7 +118,7 @@ rows_gb_all = per_subject('graph', 'baseline', ids, 'Q2b Graph minus BASELINE, A
 rows_gf_all = per_subject('graph', 'function', ids, 'Q1b Graph minus Function, ALL 10,198 (incl. paper-like)')
 
 json.dump({'gf_real': rows_gf, 'gb_real': rows_gb, 'gb_all': rows_gb_all, 'gf_all': rows_gf_all},
-          open('<WORKDIR>','w'), indent=1)
+          open('STUDY_WORKING_TREE_NOT_RELEASED','w'), indent=1)
 
 # ---------------- difficulty ----------------
 print('\n\n===== Q3/Q4 difficulty bands =====')

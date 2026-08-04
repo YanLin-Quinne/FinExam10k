@@ -16,6 +16,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -29,7 +30,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt                       # noqa: E402
 from matplotlib.patches import FancyBboxPatch          # noqa: E402
 
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
 OUT = pathlib.Path(__file__).resolve().parent / "figures"
 OUT.mkdir(exist_ok=True)
 
@@ -57,7 +57,7 @@ def subject(row: dict) -> str | None:
 
 
 def main() -> int:
-    data = json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))
+    data = list(PD.items().values())
     by_stage = {}
     for _, level, _, _ in STAGES:
         rows = [r for r in data if r["level"] == level and subject(r)]

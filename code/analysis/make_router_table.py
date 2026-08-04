@@ -24,6 +24,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -38,10 +39,6 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import router as RT                                   # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
-PoT = pathlib.Path.home() / "Desktop" / "finexam-gpt4o-pot-four-experiments-20260801" / \
-      "runs" / "graph-pot"
-DIRECT = pathlib.Path("<PATH>/Documents/New project 3/finexam-openai-eval/runs/openrouter")
 LETTERS = {"A", "B", "C", "D"}
 SEED = 202607
 BOOT = 10000
@@ -63,15 +60,37 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
     return (c - h) * 100, (c + h) * 100
 
 
+
+def _require_heldout(*needed: pathlib.Path) -> None:
+    """Stop with an explanation when the held-out decision files are absent, which is the norm.
+
+    This table is scored on the 5,088 held-out items. Those decisions are not part of the release,
+    because releasing them would hand over the per-item routing of a partition whose whole purpose
+    is to stay unseen. `data/router/heldout_decision_manifest.json` carries the sha256 of the
+    decision vector instead, so the result can be checked without the items being exposed.
+    """
+    missing = [p for p in needed if not p.is_file()]
+    if missing:
+        names = ", ".join(p.name for p in missing)
+        raise SystemExit(
+            f"held-out decision files not present: {names}\n"
+            "This is expected: the held-out partition is not released, so this table "
+            "cannot be rebuilt here. What ships instead is the frozen gate and a "
+            "deterministic inference script. To reproduce the routing decisions on the "
+            "public partition, run\n"
+            "    python code/router/gate_infer.py\n"
+            f"and to verify the held-out evaluation without the items, compare its decision-vector "
+            f"hash against data/router/heldout_decision_manifest.json."
+        )
+
+
 def main() -> int:
-    data = {r["id"]: r for r in
-            json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))}
+    data = PD.items()
     gold = {i: data[i]["answer"].strip().upper() for i in data}
-    good = set(json.loads((HERE / "clean_partition.json").read_text(encoding="utf-8"))
-               ["answerable_ids"])
-    conditions = {"direct": RT.load_records(DIRECT / "gpt4o-direct-pot-full-10198.jsonl"),
-            "function": RT.load_records(PoT / "gpt4o-bupt-table5-official-full-10198.jsonl"),
-            "graph": RT.load_records(PoT / "gpt4o-learned-graph-full-10198.jsonl")}
+    good = PD.answerable()
+    conditions = {"direct": RT.load_records("gpt4o-direct-pot-full-10198.jsonl"),
+            "function": RT.load_records("gpt4o-bupt-table5-official-full-10198.jsonl"),
+            "graph": RT.load_records("gpt4o-learned-graph-full-10198.jsonl")}
 
     def pred(a, i):
         return str(conditions[a].get(i, {}).get("prediction") or "").strip().upper()
@@ -79,6 +98,8 @@ def main() -> int:
     def ok(a, i):
         return pred(a, i) == gold[i]
 
+    _require_heldout(HERE / "router_heldout_decisions.json",
+                     HERE / "router_gate_decisions.json")
     posthoc = json.loads((HERE / "router_heldout_decisions.json").read_text())["decisions"]
     gate = json.loads((HERE / "router_gate_decisions.json").read_text())["decisions"]
     held = sorted(gate)

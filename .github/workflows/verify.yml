@@ -1,8 +1,10 @@
 name: verify
 
-# Runs on every push and pull request. The point is that the reproducibility claims in the README
-# are checked by machine rather than asserted by us. If this badge is not green, something in the
-# bundle is broken and the claims should not be believed.
+# Every reproducibility claim the README makes is checked here by machine rather than asserted by
+# us. An earlier revision of this workflow proved only that the files compiled and that their
+# hashes matched, which is how sixteen scripts reached the release still rooted in the curation
+# machine's home directory: they compiled, they hashed, and they failed at their first read
+# anywhere else. The documented reproduction path is now actually executed.
 
 on:
   push:
@@ -19,8 +21,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install
-        run: python -m pip install --quiet numpy scikit-learn matplotlib
+      - name: Install pinned dependencies
+        run: python -m pip install --quiet -r requirements.txt
 
       - name: Every python file compiles
         run: python -m compileall -q code tests
@@ -28,24 +30,89 @@ jobs:
       - name: Bundle self-test
         run: python tests/test_bundle.py
 
-      - name: Deterministic gate inference on the public partition
-        run: python code/router/gate_infer.py
+      # The steps below are the README's Quick Start run verbatim, from a clean checkout on a
+      # machine that has never seen the curation tree. This is the check that catches the class of
+      # defect described at the top of this file.
+      - name: Quick start, error concentration against an exact per-item null
+        working-directory: code/analysis
+        run: python why_hard372.py
 
-      - name: Manifest is complete
+      - name: Quick start, slice sweep with Benjamini-Hochberg correction
+        working-directory: code/analysis
+        run: python where_graph_wins.py
+
+      - name: Quick start, rescue and harm by retrieval condition
+        working-directory: code/analysis
+        run: python rq2_error_analysis.py
+
+      - name: Quick start, deterministic gate inference
+        working-directory: code/router
+        run: python gate_infer.py
+
+      - name: Quick start, curriculum taxonomy figure
+        working-directory: code/figures
+        run: python make_taxonomy_figure.py
+
+      - name: Gate decisions are identical across runs
+        run: |
+          python - <<'PY'
+          import re, subprocess, sys
+          def vector():
+              r = subprocess.run([sys.executable, "gate_infer.py"], cwd="code/router",
+                                 capture_output=True, text=True, check=True)
+              m = re.search(r"decision vector sha256\s+([0-9a-f]{64})", r.stdout)
+              assert m, r.stdout
+              return m.group(1)
+          a, b = vector(), vector()
+          assert a == b, f"gate inference is not deterministic: {a} then {b}"
+          print(f"decision vector stable across runs: {a}")
+          PY
+
+      - name: Manifest is complete and every hash matches
         run: |
           python - <<'PY'
           import hashlib, pathlib
-          root = pathlib.Path(".")
-          listed = set()
+          listed = {}
           for line in pathlib.Path("MANIFEST.sha256").read_text().splitlines():
               if line.strip():
-                  listed.add(line.split("  ", 1)[1])
-          on_disk = {
-              str(p) for p in root.rglob("*")
-              if p.is_file() and ".git" not in p.parts and "__pycache__" not in p.parts
-              and p.name != "MANIFEST.sha256"
-          }
-          missing = sorted(on_disk - listed)
-          assert not missing, f"{len(missing)} files are not in the manifest: {missing[:5]}"
-          print(f"manifest covers all {len(listed)} files")
+                  want, rel = line.split("  ", 1)
+                  listed[rel] = want
+          bad = []
+          for rel, want in listed.items():
+              p = pathlib.Path(rel)
+              if not p.is_file():
+                  bad.append(f"missing {rel}")
+                  continue
+              h = hashlib.sha256()
+              with p.open("rb") as f:
+                  for c in iter(lambda: f.read(1 << 20), b""):
+                      h.update(c)
+              if h.hexdigest() != want:
+                  bad.append(f"hash differs {rel}")
+          assert not bad, bad[:5]
+          print(f"manifest verified over {len(listed)} files")
+          PY
+
+      - name: No credential, local path or held-out identifier ships
+        run: |
+          python - <<'PY'
+          import pathlib, re
+          shipped = {line.split("  ", 1)[1] for line in
+                     pathlib.Path("MANIFEST.sha256").read_text().splitlines() if line.strip()}
+          roots = ["Users", "home", "mnt", "scratch", "nobackup", "workspace"]
+          pat = re.compile("|".join([r"/(?:" + "|".join(roots) + r")/[A-Za-z0-9_.-]+",
+                                     r"Path" + r"\.home\(\)",
+                                     "sk" + "-proj-", "sk" + "-or-v1-",
+                                     "OPENROUTER" + "_API_KEY"]))
+          bad = []
+          for rel in sorted(shipped):
+              p = pathlib.Path(rel)
+              if p.suffix not in {".py", ".md", ".tex", ".json", ".html", ".yml"}:
+                  continue
+              if rel.endswith("tests/test_bundle.py") or rel.startswith(".github"):
+                  continue                       # these name the patterns they search for
+              if pat.search(p.read_text(encoding="utf-8", errors="replace")):
+                  bad.append(rel)
+          assert not bad, f"{len(bad)} files carry a local path or credential: {bad[:5]}"
+          print(f"scanned {len(shipped)} released files, none carry a path or credential")
           PY

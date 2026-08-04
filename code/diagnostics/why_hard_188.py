@@ -18,6 +18,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import json
@@ -45,17 +46,22 @@ MIN_CELL = 30  # anything below this is reported as UNSTABLE, never as a stable 
 # 0. data
 # ----------------------------------------------------------------------------
 QS, R, NAMES = load_all()
-LAB = json.load(open(HERE / 'difficulty_v1.json'))['labels']
+LAB = PD.difficulty()
 
-ZERO = sorted(q for q in QS if not any(ok(R[m][q]) for m in NAMES))
+ZERO = sorted(q for q in QS if not any(ok(R[m][q], q) for m in NAMES))
 HARD = sorted(q for q in QS if LAB[q]['band'] == 'hard')
 REST_HARD = sorted(set(HARD) - set(ZERO))
 EASY = sorted(q for q in QS if LAB[q]['band'] == 'easy')
 MEDIUM = sorted(q for q in QS if LAB[q]['band'] == 'medium')
 ALL = sorted(QS)
 
-assert len(ZERO) == 188 and len(HARD) == 1437 and len(REST_HARD) == 1249, (
-    len(ZERO), len(HARD), len(REST_HARD))
+# The paper's 188, 1,437 and 1,249 count over all 10,198 items. This release carries the 5,110
+# public ones, so the same definitions select 118, 859 and 741 here. What is asserted is the
+# structure that must hold in either scope, not the full-corpus magnitudes.
+assert len(ZERO) + len(REST_HARD) == len(HARD), (len(ZERO), len(REST_HARD), len(HARD))
+assert len(ZERO) == len(PD.zero_solve()), (
+    f"zero-solve recomputed from the response matrix gives {len(ZERO)}, but the shipped "
+    f"diagnostic file lists {len(PD.zero_solve())}. One of the two is stale.")
 assert set(ZERO) <= set(HARD), 'zero-solve items must all be in the hard band'
 
 # ----------------------------------------------------------------------------
@@ -69,34 +75,21 @@ assert set(ZERO) <= set(HARD), 'zero-solve items must all be in the hard band'
 # ----------------------------------------------------------------------------
 AUDIT = {
     # ---- (c) rationale supports a different option than the gold label -------
-    '8fa22cb7681dd27801280d1006322818': dict(
+    '5d6606aa34908e56': dict(
         cls='c', rationale_answer='C', explicit=True, models_agree_with_rationale=True,
         why='Rationale letter says B but its arithmetic returns 0.70, which is option C; '
             'a later sentence in the SAME rationale calls 0.36 (the gold option B) incorrect.',
         quote='B is correct because the addition rule is P(W1 or W2) = P(W1) + P(W2) - P(W1W2) ... '
               'we have P(W1 or W2) = 0.5 + 0.5 - 0.3 = 0.70. ... '
               'B is incorrect because it is the squared conditional probability ... (0.6)(0.6) = 0.36.'),
-    '9eb3651569a9225f043061447a61ce24': dict(
-        cls='c', rationale_answer='D', explicit=True, models_agree_with_rationale=True,
-        why='Rationale defines OLS as minimising the sum of squared residuals, which is option D '
-            'verbatim. Gold B ("minimizes the number of independent variables") is not what the '
-            'rationale says and is not a property of OLS.',
-        quote='OLS is a process that minimizes the sum of squared residuals to produce estimates '
-              'of the population parameters known as sample regression coefficients.'),
-    'd43898786a1fcab30669b3f108743c95': dict(
+    'b701f1182e320bc4': dict(
         cls='c', rationale_answer='C', explicit=True, models_agree_with_rationale=True,
         why='Rationale is entirely about Tier 1 aggregate limits and Tier 2 granular limits, which '
             'is option C verbatim. Gold B (CRO authority over limit exceptions) is never mentioned.',
         quote='Under Basel guidelines, a well-designed limit system should have limits set at the '
               'aggregate (Tier 1) level and then allocated to individual business lines or risk '
               'types (Tier 2).'),
-    '9eb3651569a9225f0430626b24fcd6c5': dict(
-        cls='c', rationale_answer=None, explicit=True, models_agree_with_rationale=False,
-        why='Rationale states Leeson held double LONG positions and used a SHORT straddle. Gold D '
-            'says "double short". Options C and D are byte-identical, so no option can be correct.',
-        quote='Leeson used a short straddle strategy on the Nikkei 225 and held speculative double '
-              'long positions in the market for Nikkei 225 futures contracts.'),
-    'b8ca528e69cb9cd1072611c41c10d80b': dict(
+    '50c740ee6c02b0c1': dict(
         cls='c', rationale_answer='A', explicit=False, models_agree_with_rationale=False,
         why='Self-contradictory. Header says "Correct Answer: C"; the body says "A Correct" and its '
             'arithmetic yields allocation -50 bps and selection +40 bps, which is option A. Gold C '
@@ -105,20 +98,8 @@ AUDIT = {
               'as follows ... Allocation effect: A = rA - rB = 9.0% - 9.5% = -0.50% or -50 basis '
               'points  Selection effect: S = rS - rB = 9.9% - 9.5% = 0.40% or 40 basis points'),
     # ---- (d) rationale missing or unusable ----------------------------------
-    '9eb3651569a922610430716432d56d10': dict(
-        cls='d', rationale_answer=None, explicit=False, models_agree_with_rationale=False,
-        why='Rationale field is the literal string "no explanation". The transition matrix the stem '
-            'refers to is also absent, so the gold cannot be checked from the item at all.',
-        quote='无解析'),
     # ---- (b) rationale on-topic but does not resolve to a unique option ------
-    '9eb3651569a9225f043063381b8de38d': dict(
-        cls='b', rationale_answer=None, explicit=False, models_agree_with_rationale=False,
-        why='Options are the bare letters A/B/C/D and the statement-to-option mapping is absent from '
-            'the item, so the rationale (statement 1 wrong, statement 2 right) cannot be mapped to '
-            'gold D.',
-        quote='The first statement is incorrect in that it is backward looking. ... The second '
-              'statement is correct.'),
-    'd43898786a1fcab30669b317669051e4': dict(
+    'b159a39f200e5049': dict(
         cls='b', rationale_answer=None, explicit=False, models_agree_with_rationale=False,
         why='Options are "Chart A".."Chart D" and no chart is present in the item. The rationale '
             'states the shape rule but never names a chart, so gold D is unverifiable.',
@@ -130,22 +111,11 @@ AUDIT = {
 #      saying the shipped gold is wrong. The rationale still argues for gold, so
 #      these are NOT class (c); they are logged on their own.
 CURATOR_NOTE = {
-    '9eb3651569cba5af0709e42301a263c2': dict(
-        note_answer='B', models_agree_with_note=True,
-        quote='birth. -> 这道题官方的答案错了，A应'
-              '该是错误的，选B',
-        gloss='"this question\'s official answer is wrong, A should be wrong, choose B" -- appended '
-              'to the text of options A and B by whoever built the set.'),
-    '9eb3651569cba5af0709e4320a7e16ca': dict(
-        note_answer='C', models_agree_with_note=True,
-        quote='tax-related considerations.-》原版答案有问题，'
-              '应该选C',
-        gloss='"the original answer is wrong, should choose C" -- appended to the text of option C.'),
 }
 
 # ---- one further item-integrity defect found while reading, logged separately -
 ARITHMETIC_DEFECT = {
-    'd43898786a1fcab30669b413511ed44d': dict(
+    '8cbfa55ddb855fed': dict(
         why='Rationale names gold C explicitly, but its own discount factors give '
             '67,500x0.978012 + 67,500x0.952375 + 4,567,500x0.923805 = 4,349,778, which is '
             'USD 1,000,000 away from option C (3,349,780) and matches no option. The gold option '
@@ -154,8 +124,11 @@ ARITHMETIC_DEFECT = {
               'x 0.923805 ... the present value is USD 3,349,780 (option C).'),
 }
 
+# The adjudication notes below cover the zero-solve items that fall in the released partition.
+# Notes on held-out items are withheld with the items themselves, so this list is shorter than
+# the one the paper's appendix describes.
 for k in list(AUDIT) + list(CURATOR_NOTE) + list(ARITHMETIC_DEFECT):
-    assert k in set(ZERO), f'audited id {k} is not one of the 188'
+    assert k in set(ZERO), f'audited id {k} is not zero-solve on the released partition'
 
 def audit_cls(qid: str) -> str:
     return AUDIT.get(qid, {}).get('cls', 'a')
@@ -572,7 +545,7 @@ for g in ['A', 'B', 'C', 'D']:
     ids = [q for q in ALL if QS[q]['answer'] == g]
     if not ids:
         continue
-    acc = np.mean([[ok(R[m][q]) for m in NAMES] for q in ids])
+    acc = np.mean([[ok(R[m][q], q) for m in NAMES] for q in ids])
     sel = sum(1 for q in ALL for m in NAMES if pred(R[m][q]) == g)
     avail = [q for q in ALL if any(o['id'] == g for o in QS[q]['options'])]
     # if a model picked uniformly among the options actually offered, how often would

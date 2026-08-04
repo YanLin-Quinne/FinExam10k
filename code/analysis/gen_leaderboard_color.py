@@ -94,7 +94,7 @@ def band_of(score: float) -> str:
 def group_score(records: dict, names: list[str], item: str) -> float:
     groups = [[n for n in names if n not in LOCAL], [n for n in names if n in LOCAL]]
     groups = [g for g in groups if g]
-    return sum(sum(1 for n in g if ok(records[n][item])) / len(g) for g in groups) / len(groups)
+    return sum(sum(1 for n in g if ok(records[n][item], item)) / len(g) for g in groups) / len(groups)
 
 
 def measure() -> tuple[dict, list[str], float, int]:
@@ -112,13 +112,13 @@ def measure() -> tuple[dict, list[str], float, int]:
     rows = {}
     for model in names:
         record = records[model]
-        row = {"overall": sum(1 for i in items if ok(record[i])) / len(items),
+        row = {"overall": sum(1 for i in items if ok(record[i], i)) / len(items),
                "unparsed": sum(1 for i in items if pred(record[i]) not in ("A", "B", "C", "D"))}
         for level, ids in by_level.items():
-            row[SHORT[level]] = sum(1 for i in ids if ok(record[i])) / len(ids)
+            row[SHORT[level]] = sum(1 for i in ids if ok(record[i], i)) / len(ids)
         for band in ("easy", "medium", "hard"):
             ids = [i for i in items if loo_band[model][i] == band]
-            row[band] = sum(1 for i in ids if ok(record[i])) / len(ids) if ids else None
+            row[band] = sum(1 for i in ids if ok(record[i], i)) / len(ids) if ids else None
         row["hard_chance"] = statistics.mean(1 / 3 if questions[i]["exam"] == "CFA" else 1 / 4
                                              for i in items if loo_band[model][i] == "hard")
         rows[model] = row

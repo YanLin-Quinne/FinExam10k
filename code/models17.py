@@ -24,12 +24,22 @@ MODELS = [(n, None) for n in NAMES]
 PROPRIETARY, OPEN_GENERAL, OPEN_FINANCE = (
     "Proprietary", "Open-weight reasoning", "Finance-specialized")
 
+# Examination stages in curriculum order, which is the order every table and figure prints them in.
+# Derived from the released items rather than hard coded, so a stage cannot silently go missing.
+_ORDER = ["Level I", "Level II", "Level III", "Part I", "Part II"]
+LEVELS = [lv for lv in _ORDER if any(r["level"] == lv for r in _ITEMS)]
+
 
 def load_all():
-    """(item ids, responses[system][item] -> predicted letter, system names)."""
+    """(questions by id, responses[system][item] -> predicted letter, system names).
+
+    The first element is the item mapping, not a bare id list. Callers that only want the ids use
+    `sorted(questions)`, which yields the same sorted keys either way, and callers that need the
+    stem or the stage index into it directly.
+    """
     R = {m: {i: _M["predictions"][i][k] for i in _M["predictions"]}
          for k, m in enumerate(NAMES)}
-    return sorted(_M["predictions"]), R, NAMES
+    return load_questions(), R, NAMES
 
 
 def pred(letter):
@@ -38,8 +48,19 @@ def pred(letter):
 
 
 def ok(letter, item_id=None):
-    """Correctness needs the item, so scripts should prefer correct() below."""
-    return bool(letter) and item_id is not None and letter == GOLD[item_id]
+    """True when `letter` is the gold answer for `item_id`.
+
+    The item id is not optional. An earlier version of this shim defaulted it to None and returned
+    False in that case, which turned every one-argument call into a silent zero: the script ran,
+    exited 0, and reported that no system answered anything correctly. Raising here means a call
+    site that forgets the id fails at once instead of producing a plausible wrong table.
+    """
+    if item_id is None:
+        raise TypeError(
+            "ok() needs the item id: correctness is a property of the (prediction, item) pair, "
+            "not of the letter alone. Call ok(records[system][item], item), or use "
+            "correct(system, item).")
+    return bool(letter) and letter == GOLD[item_id]
 
 
 def correct(system: str, item_id: str) -> bool:

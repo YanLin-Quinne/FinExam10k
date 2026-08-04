@@ -169,15 +169,30 @@ class NoLeakage(unittest.TestCase):
             self.assertNotIn("private_real_exam", blob, f"{p.name} references the held-out split")
 
     def test_no_credentials_or_local_paths(self):
-        # Built from fragments so this file does not match its own pattern.
-        home = "/" + "Users" + "/"
-        pat = re.compile("|".join([re.escape(home) + r"[A-Za-z0-9_.-]+",
-                                   "sk" + "-proj-", "sk" + "-or-v1-",
-                                   "openai" + "_api_key"]))
+        # Built from fragments so this file does not match its own pattern. The earlier version
+        # of this test matched only one home prefix, which let `Path.home()` and every non-macOS
+        # layout through: sixteen files reached the release still rooted outside the bundle.
+        roots = ["Users", "home", "mnt", "scratch", "nobackup", "workspace"]
+        pat = re.compile("|".join(
+            [r"/(?:" + "|".join(roots) + r")/[A-Za-z0-9_.-]+",
+             r"Path" + r"\.home\(\)",
+             r"<" + r"PATH>", r"<" + r"WORKDIR>",
+             r"[A-Za-z]:\\\\Users",
+             "sk" + "-proj-", "sk" + "-or-v1-", "hf" + "_[A-Za-z0-9]{20}",
+             "openai" + "_api_key", "OPENROUTER" + "_API_KEY"]))
+        # Only release content is scanned. Running the analysis writes result files next to the
+        # scripts, and those are run products rather than things we ship, so the manifest is the
+        # authority on what counts.
+        shipped = {line.split("  ", 1)[1] for line in
+                   (ROOT / "MANIFEST.sha256").read_text().splitlines() if line.strip()}
         bad = []
         for p in sorted(ROOT.rglob("*")):
             if not p.is_file() or ".git" in p.parts or p.name == "MANIFEST.sha256":
                 continue
+            if str(p.relative_to(ROOT)) not in shipped:
+                continue
+            if p.resolve() == pathlib.Path(__file__).resolve():
+                continue                       # this file names the patterns it searches for
             if p.suffix not in {".py", ".md", ".tex", ".json", ".html"}:
                 continue
             if p.stat().st_size > 40_000_000:
@@ -185,6 +200,128 @@ class NoLeakage(unittest.TestCase):
             if pat.search(p.read_text(encoding="utf-8", errors="replace")):
                 bad.append(str(p.relative_to(ROOT)))
         self.assertEqual(bad, [], f"{len(bad)} files carry a local path or credential")
+
+
+class Runs(unittest.TestCase):
+    """Compiling is not running. These import and execute what the README tells a reader to."""
+
+    def test_every_module_imports(self):
+        """A missing import is invisible to compileall and fatal at run time.
+
+Each module is imported in its own subprocess with only the
+        `code` root on the path, so one module's import-time state cannot mask another's failure
+        and the two files both named `router` resolve unambiguously by package.
+        """
+        import subprocess
+        bad = []
+        for p in sorted((ROOT / "code").rglob("*.py")):
+            rel = p.relative_to(ROOT / "code")
+            if rel.parts[0] in {"study_reference", "upstream_reference"} or p.name == "__init__.py":
+                continue
+            # A subprocess, so one module's import-time state cannot mask another's failure.
+            dotted = ".".join(rel.with_suffix("").parts)
+            probe = (f"import importlib,sys;"
+                     f"sys.path.insert(0,{str(ROOT / 'code')!r});"
+                     f"importlib.import_module({dotted!r})")
+            r = subprocess.run([sys.executable, "-c", probe],
+                               capture_output=True, text=True, timeout=300)
+            # A module that stops on purpose says so with a marker, so a deliberate
+            # stop can never be confused with a broken import.
+            if r.returncode != 0 and "[dependency-not-released]" not in r.stderr:
+                last = (r.stderr.strip().splitlines() or ["?"])[-1]
+                bad.append(f"{rel}: {last[:70]}")
+        self.assertEqual(bad, [], f"{len(bad)} modules do not import")
+
+    def test_no_script_reaches_outside_the_bundle(self):
+        """Every path a script resolves must sit under the bundle root."""
+        import ast
+        bad = []
+        for p in sorted((ROOT / "code").rglob("*.py")):
+            if p.relative_to(ROOT / "code").parts[0] in {"study_reference", "upstream_reference"}:
+                continue
+            for n in ast.walk(ast.parse(p.read_text(encoding="utf-8"))):
+                if (isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
+                        and n.func.attr == "home"):
+                    bad.append(f"{p.relative_to(ROOT)}:{n.lineno} calls Path.home()")
+        self.assertEqual(bad, [], f"{len(bad)} scripts resolve a path outside the bundle")
+
+    def test_correctness_needs_the_item_id(self):
+        """One-argument ok() used to return False silently, zeroing whole tables."""
+        import models17
+        with self.assertRaises(TypeError):
+            models17.ok("A")
+        i = sorted(models17.GOLD)[0]
+        self.assertTrue(models17.ok(models17.GOLD[i], i))
+        self.assertFalse(models17.ok("Z", i))
+
+    def test_no_single_argument_ok_call_survives(self):
+        import ast
+        bad = []
+        for p in sorted((ROOT / "code").rglob("*.py")):
+            if p.relative_to(ROOT / "code").parts[0] in {"study_reference", "upstream_reference"}:
+                continue
+            for n in ast.walk(ast.parse(p.read_text(encoding="utf-8"))):
+                if (isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+                        and n.func.id in {"ok", "_ok"} and len(n.args) == 1 and not n.keywords):
+                    bad.append(f"{p.relative_to(ROOT)}:{n.lineno}")
+        self.assertEqual(bad, [], f"{len(bad)} correctness calls omit the item id")
+
+    def test_documented_commands_run(self):
+        """Every command the README's Quick Start lists, actually executed."""
+        import subprocess
+        cmds = [("code/analysis", "why_hard372.py"),
+                ("code/analysis", "where_graph_wins.py"),
+                ("code/analysis", "rq2_error_analysis.py"),
+                ("code/router", "gate_infer.py"),
+                ("code/figures", "make_taxonomy_figure.py")]
+        bad = []
+        for cwd, script in cmds:
+            r = subprocess.run([sys.executable, script], cwd=ROOT / cwd,
+                               capture_output=True, text=True, timeout=900)
+            if r.returncode != 0:
+                bad.append(f"{cwd}/{script} exited {r.returncode}: "
+                           f"{(r.stderr or r.stdout).strip().splitlines()[-1][:70]}")
+            elif len(r.stdout.strip()) < 40:
+                bad.append(f"{cwd}/{script} exited 0 but printed almost nothing")
+        self.assertEqual(bad, [], "\n".join(bad))
+
+    def test_public_diagnostics_agree_with_the_response_matrix(self):
+        """The shipped diagnostic sets must be recomputable, not merely asserted."""
+        sys.path.insert(0, str(ROOT / "code"))
+        import models17
+        import publicdata as PD
+        qs, R, names = models17.load_all()
+        zero = sorted(q for q in qs if not any(models17.ok(R[m][q], q) for m in names))
+        self.assertEqual(zero, PD.zero_solve(),
+                         "zero-solve recomputed from the response matrix differs from the "
+                         "shipped diagnostic file")
+        hard = set(PD.band("hard"))
+        self.assertTrue(set(PD.context_complete_hard()) <= hard,
+                        "a context-complete hard item is not in the hard band")
+        self.assertTrue(set(PD.context_complete_hard()) <= PD.answerable())
+
+
+class Leakage(unittest.TestCase):
+    def test_no_held_out_identifier_appears_in_code_or_docs(self):
+        """Code once carried adjudication notes keyed by six held-out item ids."""
+        public = {r["id"] for r in load("data/finexam10k_public_5110.json")}
+        idlike = re.compile(r"\b[0-9a-f]{16}\b")
+        bad = []
+        shipped = {line.split("  ", 1)[1] for line in
+                   (ROOT / "MANIFEST.sha256").read_text().splitlines() if line.strip()}
+        for p in sorted(ROOT.rglob("*")):
+            if not p.is_file() or ".git" in p.parts or p.name == "MANIFEST.sha256":
+                continue
+            if str(p.relative_to(ROOT)) not in shipped:
+                continue
+            if p.suffix not in {".py", ".md", ".tex"}:
+                continue
+            for found in set(idlike.findall(p.read_text(encoding="utf-8", errors="replace"))):
+                if found == "0123456789abcdef":
+                    continue               # the hex alphabet, not an identifier
+                if found not in public:
+                    bad.append(f"{p.relative_to(ROOT)}: {found}")
+        self.assertEqual(bad, [], f"{len(bad)} identifiers are not from the released partition")
 
 
 if __name__ == "__main__":

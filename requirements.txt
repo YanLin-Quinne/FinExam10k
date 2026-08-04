@@ -1,0 +1,7 @@
+# Pinned so a reviewer's run and ours cannot diverge on a library default. These are the versions
+# every number in the paper was computed under. Nothing here needs a GPU: the bundle ships derived
+# predictions rather than weights, and no inference is rerun.
+numpy==1.26.4
+scipy==1.11.4
+scikit-learn==1.4.2
+matplotlib==3.8.4

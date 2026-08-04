@@ -1,14 +1,11 @@
-"""GPT-4o four-experiment comparison. Run this the moment the conditions finish.
+"""STUDY RECORD, NOT PART OF THE REPRODUCTION PATH.
 
-Conditions:
-  1 Direct PoT, no knowledge augmentation      (already complete, 10,198 rows)
-  2 BUPT Table 5 Function-RAG PoT              Contriever top-30 -> GPT-4o judge -> <=3 -> PoT
-  3 Label-supervised learned FunctionGraph-RAG PoT     shares condition 2's query and top-30, graph rerank
-  4 Conditional verifier                       fires only where conditions 2 and 3 disagree
+This script ran during the study against the working tree, which held the full 10,198 item corpus
+and the raw per-condition inference shards. Neither is part of the release, so this file cannot
+execute here and is not imported by anything that can. It ships because the procedure it encodes is
+worth reading: it is the four-condition PoT comparison, run over the raw shards before the intervention matrix was derived from them.
 
-Every comparison is paired McNemar on the same items, with Benjamini-Hochberg across the
-family. Paired tests are what make the mid-run route change harmless: conditions 2 and 3 answer
-the same item over the same route, so any provider effect cancels in the difference.
+Nothing in `code/analysis`, `code/figures`, `code/selector` or `code/router` depends on this file.
 """
 from __future__ import annotations
 
@@ -24,12 +21,8 @@ import statistics
 import sys
 from collections import Counter, defaultdict
 
-BUNDLE = pathlib.Path.home() / "Desktop" / "finexam-gpt4o-pot-four-experiments-20260801"
 RUNS = BUNDLE / "runs" / "graph-pot"
-DIRECT_POT = pathlib.Path("<PATH>/Documents/New project 3/finexam-openai-eval/runs/"
-                          "openrouter/gpt4o-direct-pot-full-10198.jsonl")
 SWITCH_EPOCH = pathlib.Path("/tmp/route_switch_epoch")
-DATA = pathlib.Path("<PATH>/Documents/finexam-10k-leaderboard/data")
 LABELS = pathlib.Path(__file__).resolve().parent / "difficulty_v1.json"
 
 CONDITIONS = {

@@ -36,6 +36,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -52,10 +53,6 @@ from sklearn.model_selection import StratifiedKFold
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 HERE = pathlib.Path(__file__).resolve().parent
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
-PoT = pathlib.Path.home() / "Desktop" / "finexam-gpt4o-pot-four-experiments-20260801" / \
-      "runs" / "graph-pot"
-DIRECT = pathlib.Path("<PATH>/Documents/New project 3/finexam-openai-eval/runs/openrouter")
 PUBLIC = "public_mock_practice"
 SEED = 202607
 CONDITIONS = ("direct", "function", "graph")
@@ -63,18 +60,14 @@ LETTERS = {"A", "B", "C", "D"}
 BOOT = 10000
 
 
-def load_records(path: pathlib.Path) -> dict[str, dict]:
-    out: dict[str, dict] = {}
-    rec = path.with_suffix(path.suffix + ".records")
-    if rec.is_dir():
-        for shard in rec.glob("*.json"):
-            v = json.loads(shard.read_text(encoding="utf-8"))
-            out[str(v["id"])] = v
-    for line in path.open(encoding="utf-8"):
-        if line.strip():
-            v = json.loads(line)
-            out.setdefault(str(v["id"]), v)
-    return out
+def load_records(shard: str) -> dict[str, dict]:
+    """Parsed predictions for one condition, keyed by item id.
+
+    The study read the inference shard of this name directly. The release ships
+    the derived intervention matrix instead, so the shard name resolves to its
+    condition and the call sites keep their original shape.
+    """
+    return PD.run(shard)
 
 
 def mcnemar_exact(b: int, c: int) -> float:
@@ -94,14 +87,13 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
 
 
 def main() -> int:
-    data = {r["id"]: r for r in
-            json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))}
+    data = PD.items()
     items = sorted(data)
     gold = {i: data[i]["answer"].strip().upper() for i in items}
 
-    conditions = {"direct": load_records(DIRECT / "gpt4o-direct-pot-full-10198.jsonl"),
-            "function": load_records(PoT / "gpt4o-bupt-table5-official-full-10198.jsonl"),
-            "graph": load_records(PoT / "gpt4o-learned-graph-full-10198.jsonl")}
+    conditions = {"direct": load_records("gpt4o-direct-pot-full-10198.jsonl"),
+            "function": load_records("gpt4o-bupt-table5-official-full-10198.jsonl"),
+            "graph": load_records("gpt4o-learned-graph-full-10198.jsonl")}
 
     def pred(a: str, i: str) -> str:
         return str(conditions[a].get(i, {}).get("prediction") or "").strip().upper()
@@ -111,6 +103,15 @@ def main() -> int:
 
     pub = [i for i in items if data[i]["publication_split"] == PUBLIC]
     held = [i for i in items if data[i]["publication_split"] != PUBLIC]
+    if not held:
+        raise SystemExit(
+            "no held-out items are present, so there is nothing to score.\n"
+            "This script fits on the public partition and evaluates on the held-out partition, "
+            "which is not released. What ships instead is the frozen gate and a deterministic "
+            "inference script: run `python code/router/gate_infer.py` to reproduce the routing "
+            "decisions on the public partition, and compare its decision-vector hash against "
+            "data/router/heldout_decision_manifest.json to verify the held-out evaluation "
+            "without the items being exposed.")
     PUB_SET, HELD_SET = set(pub), set(held)
     assert not (PUB_SET & HELD_SET) and len(pub) + len(held) == len(items)
     print(f"开发集（公开半）{len(pub)}   测试集（隐藏半）{len(held)}\n")
@@ -222,8 +223,8 @@ def main() -> int:
               "public_id_sha256": hashlib.sha256(
                   "".join(sorted(pub)).encode()).hexdigest(),
               "held_out_never_seen": True}
-    (HERE / "router_v2_frozen.json").write_text(json.dumps(frozen, indent=1), encoding="utf-8")
-    print(f"已冻结到 router_v2_frozen.json\n")
+    (HERE / "router_per_condition_frozen.json").write_text(json.dumps(frozen, indent=1), encoding="utf-8")
+    print(f"已冻结到 router_per_condition_frozen.json\n")
 
     # ---------------------------------------------------- 隐藏半，单次评测
     Xh = matrix(held, HELD_SET)

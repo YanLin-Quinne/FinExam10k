@@ -1,3 +1,12 @@
+"""STUDY RECORD, NOT PART OF THE REPRODUCTION PATH.
+
+This script ran during the study against the working tree, which held the full 10,198 item corpus
+and the raw per-condition inference shards. Neither is part of the release, so this file cannot
+execute here and is not imported by anything that can. It ships because the procedure it encodes is
+worth reading: it attempts to refute the subject-level findings.
+
+Nothing in `code/analysis`, `code/figures`, `code/selector` or `code/router` depends on this file.
+"""
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
@@ -6,7 +15,6 @@ import json, re, csv, math, os
 from collections import Counter, defaultdict
 from scipy import stats
 
-ROOT="<PATH>/Documents/New project 3/finexam-10k-research"
 SH=os.path.join(ROOT,"data/private/finexam-10k")
 R=os.path.join(ROOT,"results/r1/canonical")
 

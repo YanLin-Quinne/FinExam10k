@@ -1,6 +1,16 @@
+"""STUDY RECORD, NOT PART OF THE REPRODUCTION PATH.
+
+This script ran during the study against the working tree, which held the full 10,198 item corpus
+and the raw per-condition inference shards. Neither is part of the release, so this file cannot
+execute here and is not imported by anything that can. It ships because the procedure it encodes is
+worth reading: it is the final pre-release audit of the private corpus.
+
+Nothing in `code/analysis`, `code/figures`, `code/selector` or `code/router` depends on this file.
+"""
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 #!/usr/bin/env python3
 """Final per-subject + difficulty audit. Subject taken from the DATASET shards
@@ -8,7 +18,6 @@ import paths as PATHS  # 全部路径集中在 code/paths.py
 import json, pathlib, collections, re
 from scipy import stats
 
-ROOT = pathlib.Path('<PATH>/Documents/New project 3/finexam-10k-research')
 sh = {}
 for p in sorted((ROOT/'data/private/finexam-10k').glob('*.jsonl')):
     for l in p.open(encoding='utf-8'):
@@ -16,13 +25,9 @@ for p in sorted((ROOT/'data/private/finexam-10k').glob('*.jsonl')):
         if l:
             r = json.loads(l); sh[str(r['id'])] = r
 
-def load(p):
-    d = {}
-    for l in p.open(encoding='utf-8'):
-        l = l.strip()
-        if l:
-            r = json.loads(l); d[str(r['id'])] = r
-    return d
+def load(shard: str) -> dict[str, dict]:
+    """Parsed predictions for one condition, keyed by item id."""
+    return PD.run(shard)
 R1 = ROOT/'results/r1/canonical'
 A = {'graph': load(R1/'deepseek_r1_fr_all_learned_graph_rag_mcq.jsonl'),
      'function': load(R1/'deepseek_r1_fr_llm_instruct_judge_function_rag_mcq.jsonl'),

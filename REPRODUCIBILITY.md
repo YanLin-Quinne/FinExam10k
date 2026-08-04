@@ -10,20 +10,64 @@ numpy, scikit-learn, matplotlib
 No GPU is required for anything in this bundle. The bundle carries derived model predictions, not
 model weights, so no inference is rerun.
 
-## What reproduces exactly
+## What runs here, and what it computes
 
-Every statistic the paper reports over the released public partition. Deterministic given the
-files here: bootstrap and cross-validation both use seed 202607, fixed in the scripts.
+Every command below runs from a clean checkout with nothing but `requirements.txt` installed, and
+each is executed by `run_tests.sh` and by CI on every push, so a broken one fails visibly rather
+than being discovered by a reader.
 
 ```
+python -m pip install -r requirements.txt
+bash run_tests.sh                # compiles, self-tests, then runs the commands below
+
 cd code/analysis
 python why_hard372.py            # error concentration, exact null by dynamic programming
 python where_graph_wins.py       # slice sweep, 220 tests, Benjamini-Hochberg corrected
 python rq2_error_analysis.py     # rescue and harm decomposition by intervention condition
+cd ../router
+python gate_infer.py             # frozen gate, deterministic, prints a decision-vector sha256
 cd ../figures
-python make_heatmap_subject.py   # subject heatmap
 python make_taxonomy_figure.py   # curriculum taxonomy
 ```
+
+Deterministic given the files here: bootstrap and cross-validation both use seed 202607, fixed in
+the scripts, and repeated runs of `gate_infer.py` produce a byte-identical decision vector, which
+CI checks.
+
+**These recompute over the public partition, not the full corpus.** The paper reports over all
+10,198 items and this release carries the 5,110 public ones, so the same definitions select
+proportionally smaller sets. The two most visible cases: the 372 context-complete Hard items become
+138, and the 188 zero-solve items become 118. Every script prints a scope line naming the partition
+and the count it actually ran on, so a public-partition number can never be mistaken for a
+full-corpus one. The subsetting is sound because the difficulty score s_i is computed per item from
+the frozen response matrix, so restricting the file selects a subset of each band rather than
+recomputing the bands.
+
+The self-test checks the two diagnostic sets against the response matrix rather than trusting them:
+recomputing zero-solve from the 17 systems must reproduce `data/diagnostic_zero_solve.json` exactly.
+
+## What is present but does not run here
+
+Three groups, each of which says so when invoked instead of failing obscurely.
+
+**Held-out evaluation.** `code/analysis/router.py`, `router_gate.py`, `make_router_table.py` and
+`code/rag_variants/router_per_condition.py` are fitted on the public partition and scored on the
+held-out partition. Run here they stop and explain that the held-out items are not released, and
+point at `gate_infer.py` and the decision manifest instead.
+
+**Curriculum subject figures.** `make_heatmap_subject.py`, `make_radar_subject.py` and
+`make_category_figures.py` need per-item curriculum subject labels. On the public partition the
+`category` field names the mock or practice paper an item came from, not its subject, so these stop
+with that explanation.
+
+**The program-of-thought selector.** `code/selector/pot_*.py` import five modules from the upstream
+retrieval package, which carries a Contriever checkpoint and is not ours to redistribute. They stop
+with a message naming the missing modules and pointing at the frozen selector JSON, whose graph
+hash the self-test verifies. `code/selector/cot_selector.py` runs end to end.
+
+**Study records.** `code/study_reference/` holds ten scripts that ran against the working tree over
+the full corpus and raw inference shards. They carry a banner saying so, they are excluded from the
+self-test's import and execution checks, and nothing in the reproduction path imports them.
 
 ## What does not reproduce, and why
 
@@ -31,7 +75,7 @@ python make_taxonomy_figure.py   # curriculum taxonomy
 public partition and scored once on the 5,088 held-out items, and the held-out partition is not
 released. This is the property that makes the leaderboard protocol meaningful. The router code
 ships in full so its protocol can be inspected: `code/analysis/router_gate.py` is the gate reported
-in the paper, and `code/analysis/router.py` and `code/rag_variants/router_v2.py` are the two
+in the paper, and `code/analysis/router.py` and `code/rag_variants/router_per_condition.py` are the
 variants evaluated alongside it.
 
 **Statistics quoted over all 10,198 items**, since those cover both partitions. Scripts report the

@@ -1,47 +1,18 @@
-"""Selective intervention router, multiclass formulation. Reported as a negative result.
+"""STUDY RECORD, NOT PART OF THE REPRODUCTION PATH.
 
-This is the obvious way to set the problem up and it is measurably worse than doing nothing. It is
-kept because a reader deciding how to build such a router will reach for this formulation first,
-and the reason it fails is not obvious until it is measured.
+This script ran during the study against the working tree, which held the full 10,198 item corpus
+and the raw per-condition inference shards. Neither is part of the release, so this file cannot
+execute here and is not imported by anything that can. It ships because the procedure it encodes is
+worth reading: it is the multiclass router variant that failed, kept as the negative result the per-condition binary formulation was chosen over. It was left mid-refactor and does not run even against the working tree.
 
-The idea is to label each item with whichever condition answered it correctly and fit one multinomial
-model over the three conditions. The failure is that the label is dominated by the 82 percent of items
-where every condition agrees, so it carries almost no information about the decision that actually
-matters. Held-out accuracy is 70.46 against 70.83 for always taking the direct branch, that is,
-below the policy of never intervening at all, and its public out-of-fold score of 66.79 is the
-lowest of the four variants.
-
-The formulation that works is in router_per_condition.py: one binary model per intervention condition, each
-asking whether that condition is strictly better than the direct branch. Learning the incremental
-question beats learning the argmax.
-
-Protocol is identical across all four variants and enforced the same way.
-
-What changed from version 1, and why.
-
-  The stratum feature. RQ2 showed the sharpest available signal is how many functions the
-  Function-RAG judge chose to inject. Retrieval helps where it selected exactly one and hurts
-  where it selected none, and that reversal is significant at p = 7.6e-6. Version 1 carried the
-  raw count as a single scalar, which a linear model can only use monotonically. Here it is
-  one-hot encoded and interacted with condition agreement, so the model can represent the reversal.
-
-Protocol, and how each clause is enforced rather than asserted.
-
-  Training       the 5,110 public items only.
-  Selection      every hyperparameter including the threshold is chosen by cross-validation
-                 inside the public split.
-  Freezing       the fitted model is written to disk before any held-out item is scored.
-  No peeking     enforced, not promised. The fitting path receives a feature matrix built from a
-                 whitelist of public ids, and a guard raises if any held-out id reaches it. The
-                 held-out matrix is not even constructed until after the freeze file exists.
-  Features       observable at inference time. No feature reads the gold answer, any correctness
-                 flag, or any statistic computed over the held-out half.
+Nothing in `code/analysis`, `code/figures`, `code/selector` or `code/router` depends on this file.
 """
 from __future__ import annotations
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -58,10 +29,6 @@ from sklearn.model_selection import StratifiedKFold
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 HERE = pathlib.Path(__file__).resolve().parent
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
-PoT = pathlib.Path.home() / "Desktop" / "finexam-gpt4o-pot-four-experiments-20260801" / \
-      "runs" / "graph-pot"
-DIRECT = pathlib.Path("<PATH>/Documents/New project 3/finexam-openai-eval/runs/openrouter")
 PUBLIC = "public_mock_practice"
 SEED = 202607
 CONDITIONS = ("direct", "function", "graph")
@@ -69,18 +36,14 @@ LETTERS = {"A", "B", "C", "D"}
 BOOT = 10000
 
 
-def load_records(path: pathlib.Path) -> dict[str, dict]:
-    out: dict[str, dict] = {}
-    rec = path.with_suffix(path.suffix + ".records")
-    if rec.is_dir():
-        for shard in rec.glob("*.json"):
-            v = json.loads(shard.read_text(encoding="utf-8"))
-            out[str(v["id"])] = v
-    for line in path.open(encoding="utf-8"):
-        if line.strip():
-            v = json.loads(line)
-            out.setdefault(str(v["id"]), v)
-    return out
+def load_records(shard: str) -> dict[str, dict]:
+    """Parsed predictions for one condition, keyed by item id.
+
+    The study read the inference shard of this name directly. The release ships
+    the derived intervention matrix instead, so the shard name resolves to its
+    condition and the call sites keep their original shape.
+    """
+    return PD.run(shard)
 
 
 def mcnemar_exact(b: int, c: int) -> float:
@@ -100,14 +63,13 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
 
 
 def main() -> int:
-    data = {r["id"]: r for r in
-            json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))}
+    data = PD.items()
     items = sorted(data)
     gold = {i: data[i]["answer"].strip().upper() for i in items}
 
-    conditions = {"direct": load_records(DIRECT / "gpt4o-direct-pot-full-10198.jsonl"),
-            "function": load_records(PoT / "gpt4o-bupt-table5-official-full-10198.jsonl"),
-            "graph": load_records(PoT / "gpt4o-learned-graph-full-10198.jsonl")}
+    conditions = {"direct": load_records("gpt4o-direct-pot-full-10198.jsonl"),
+            "function": load_records("gpt4o-bupt-table5-official-full-10198.jsonl"),
+            "graph": load_records("gpt4o-learned-graph-full-10198.jsonl")}
 
     def pred(a: str, i: str) -> str:
         return str(conditions[a].get(i, {}).get("prediction") or "").strip().upper()

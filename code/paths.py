@@ -19,3 +19,12 @@ RESPONSE_MATRIX = DATA / "response_matrix_public_5110.json"
 INTERVENTION_MATRIX = DATA / "intervention_matrix_public_5110.json"
 DIFFICULTY = DATA / "difficulty_labels_public_5110.json"
 CONTEXT_DEMO = DATA / "context_completeness_public.json"
+
+DIAG_HARD = DATA / "diagnostic_context_complete_hard.json"
+DIAG_ZERO = DATA / "diagnostic_zero_solve.json"
+
+SELECTOR = DATA / "selector"
+ROUTER = DATA / "router"
+SIDECAR = SELECTOR / "per_item_sidecar_public_5110.json"
+GATE_FROZEN = ROUTER / "gate_frozen.json"
+HELDOUT_MANIFEST = ROUTER / "heldout_decision_manifest.json"

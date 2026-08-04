@@ -24,6 +24,7 @@ from __future__ import annotations
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import paths as PATHS  # 全部路径集中在 code/paths.py
+import publicdata as PD  # noqa: E402
 
 
 import collections
@@ -37,29 +38,14 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 HERE = pathlib.Path(__file__).resolve().parent
-FINAL = pathlib.Path.home() / "Desktop" / "FinExam-10K-final"
-R1 = pathlib.Path.home() / "Desktop" / "finexam-deepseek-r1-cot-five-variants-20260801" / \
-     "results" / "canonical"
-PoT = pathlib.Path.home() / "Desktop" / "finexam-gpt4o-pot-four-experiments-20260801" / \
-      "runs" / "graph-pot"
-DIRECT = pathlib.Path("<PATH>/Documents/New project 3/finexam-openai-eval/runs/openrouter")
 SEED = 202607
 BOOT = 5000
 LETTERS = {"A", "B", "C", "D"}
 
 
-def load(path: pathlib.Path) -> dict[str, dict]:
-    out: dict[str, dict] = {}
-    rec = path.with_suffix(path.suffix + ".records")
-    if rec.is_dir():
-        for shard in rec.glob("*.json"):
-            v = json.loads(shard.read_text(encoding="utf-8"))
-            out[str(v["id"])] = v
-    for line in path.open(encoding="utf-8"):
-        if line.strip():
-            v = json.loads(line)
-            out.setdefault(str(v["id"]), v)
-    return out
+def load(shard: str) -> dict[str, dict]:
+    """Parsed predictions for one condition, keyed by item id."""
+    return PD.run(shard)
 
 
 def mcnemar(b: int, c: int) -> float:
@@ -85,24 +71,22 @@ def boot_ci(deltas: list[int], rng: numpy.random.Generator) -> tuple[float, floa
 
 
 def main() -> int:
-    data = {r["id"]: r for r in
-            json.loads((FINAL / "finexam10k_all_10198.json").read_text(encoding="utf-8"))}
-    lab = json.loads((HERE / "difficulty_v1.json").read_text(encoding="utf-8"))["labels"]
-    good = set(json.loads((HERE / "clean_partition.json").read_text(encoding="utf-8"))
-               ["answerable_ids"])
+    data = PD.items()
+    lab = PD.difficulty()
+    good = PD.answerable()
     gold = {i: data[i]["answer"].strip().upper() for i in data}
 
     cot = {
-        "Direct CoT": load(R1 / "deepseek_r1_baseline_mcq.jsonl"),
-        "Function-RAG (BM25)": load(R1 / "deepseek_r1_function_rag_mcq.jsonl"),
-        "Function-RAG (judge)": load(R1 / "deepseek_r1_fr_llm_instruct_judge_function_rag_mcq.jsonl"),
-        "FunctionGraph-RAG": load(R1 / "deepseek_r1_fr_all_learned_graph_rag_mcq.jsonl"),
+        "Direct CoT": load("deepseek_r1_baseline_mcq.jsonl"),
+        "Function-RAG (BM25)": load("deepseek_r1_function_rag_mcq.jsonl"),
+        "Function-RAG (judge)": load("deepseek_r1_fr_llm_instruct_judge_function_rag_mcq.jsonl"),
+        "FunctionGraph-RAG": load("deepseek_r1_fr_all_learned_graph_rag_mcq.jsonl"),
     }
     pot = {
-        "Direct PoT": load(DIRECT / "gpt4o-direct-pot-full-10198.jsonl"),
-        "Function-RAG (judge)": load(PoT / "gpt4o-bupt-table5-official-full-10198.jsonl"),
-        "FunctionGraph-RAG": load(PoT / "gpt4o-learned-graph-full-10198.jsonl"),
-        "Verifier": load(PoT / "gpt4o-graph-verifier-full-10198.jsonl"),
+        "Direct PoT": load("gpt4o-direct-pot-full-10198.jsonl"),
+        "Function-RAG (judge)": load("gpt4o-bupt-table5-official-full-10198.jsonl"),
+        "FunctionGraph-RAG": load("gpt4o-learned-graph-full-10198.jsonl"),
+        "Verifier": load("gpt4o-graph-verifier-full-10198.jsonl"),
     }
 
     sets = {

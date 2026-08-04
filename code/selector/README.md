@@ -1,7 +1,14 @@
 # Selector layer: how retrieval candidates are built and chosen
 
 The two reasoning chains use separate selectors. They are not the same construction, and the paper
-describes them separately for that reason. Everything needed to inspect either one is here.
+describes them separately for that reason.
+
+What runs and what does not. `cot_selector.py` executes here, rebuilding the quantity graph and
+the reranker features from released files. The three `pot_*` modules do not: they import five
+modules from the upstream retrieval package, which carries a Contriever checkpoint and is not
+ours to redistribute. Each stops with a message naming the missing modules. What ships instead is
+the fitted result, in `data/selector/pot_selector_frozen.json` and `pot_function_graph.json`, and
+the self-test checks that the graph's sha256 is the one the selector was frozen against.
 
 ## Program-of-Thought chain, GPT-4o
 
