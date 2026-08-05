@@ -12,7 +12,8 @@ dependencies = [
   "scipy==1.17.0",
   "scikit-learn==1.8.0",
   "matplotlib==3.10.8",
+  "XlsxWriter==3.2.5",
 ]
 
 [tool.setuptools]
-packages = ["code", "code.analysis", "code.data", "code.diagnostics", "code.figures", "code.router", "code.selector", "code.tables"]
+packages = ["code", "code.analysis", "code.data", "code.diagnostics", "code.figures", "code.release", "code.router", "code.selector", "code.tables"]
