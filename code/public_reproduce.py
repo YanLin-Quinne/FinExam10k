@@ -1,4 +1,4 @@
-"""One-command public reproduction of structural, leaderboard, RQ1, RQ2, and gate checks."""
+"""Offline public reproduction, including the real frozen public Gate entry point."""
 from __future__ import annotations
 
 import subprocess
@@ -18,7 +18,7 @@ COMMANDS = [
 
 def main() -> int:
     for command in COMMANDS:
-        print("\n==>", " ".join(command))
+        print("\n==>", " ".join(command), flush=True)
         subprocess.run(command, cwd=ROOT, check=True)
     return 0
 

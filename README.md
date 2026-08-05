@@ -31,7 +31,8 @@ code/
   models17.py                      released 17-model prediction registry
   conditions.py                    released intervention registry
   data/
-    build_public_exports.py        canonical JSONL/CSV exports for the 5,110 public records
+    build_public_exports.py        canonical JSON/JSONL/CSV/XLSX public exports
+    xlsx_artifact.py               deterministic workbook builder and OOXML sanitizer
   tables/
     make_public_tables.py          public summary table generation
   figures/
@@ -45,6 +46,9 @@ code/
     features.py                    single authoritative 27-feature implementation
     train_gate.py                  public five-fold OOF selection and frozen-model verification
     gate_infer.py                  deterministic frozen-gate inference
+  release/
+    build_anonymous_bundle.py      deterministic anonymous review ZIP builder
+    update_manifest.py             deterministic repository hash manifest
   selector/
     audit_frozen.py                PoT/CoT artifact and graph audit
     pot_candidate_protocol.py      one-hop candidate protocol
@@ -104,6 +108,14 @@ python code/router/gate_infer.py
 python code/verify_aggregate_claims.py
 ```
 
+Build a reviewer-facing anonymous ZIP separately from GitHub release automation:
+
+```bash
+python code/release/build_anonymous_bundle.py --out /tmp/FinExam10k-anonymous.zip
+```
+
+See `docs/REPRODUCIBILITY.md` for the frozen-result boundary and clean offline verification steps.
+
 ## Released public data
 
 The most reviewer-friendly files are in `data/public/`:
@@ -119,6 +131,12 @@ The most reviewer-friendly files are in `data/public/`:
 | `difficulty_context_summary.csv` | public counts by difficulty and context completeness |
 | `model_public_scores.csv` | public 17-model scores recomputed from the response matrix |
 | `intervention_public_scores.csv` | public intervention scores and rescue/harm counts |
+
+`build_public_exports.py --out NEW_DIR` constructs every listed format, including the XLSX, from
+the clean released JSON inputs. It never uses the checked-in workbook as a template. The workbook
+has the same six public and summary sheets, five summary tables, and intervention chart as the
+review artifact. Its OOXML author fields, local paths, and ZIP metadata are sanitized before its
+hash is recorded.
 
 The public partition contains 5,110 items:
 
@@ -150,9 +168,12 @@ opaque public id to its original fold. Running `train_gate.py` reproduces:
 - selected threshold: `0.68`;
 - the frozen coefficient vector and intercept to numerical tolerance.
 
-`gate_infer.py` reproduces the public frozen decision vector and records its hash in
-`public_decision_manifest.json`. The held-out partition is not distributed; the held-out result is
-recorded by aggregate counts and decision-vector hash in `heldout_decision_manifest.json`.
+`gate_infer.py` reproduces and verifies the public frozen decision vector against
+`public_decision_manifest.json`: 373 of 5,110 public items trigger, and the decision hash must
+match. The held-out partition is not distributed; its distinct frozen result is 404 triggers over
+5,088 items and is recorded only by aggregate counts and decision-vector hash in
+`heldout_decision_manifest.json`. Public reproduction does not refit or recompute that held-out
+result.
 
 The reported `1 + trigger rate` value is an implied branch-invocation count under lazy execution.
 It is not a measurement of latency, tokens, money, or energy.
@@ -185,6 +206,11 @@ alone.
 This bundle contains no author names, institution identifiers, Git history, credentials, or local
 absolute paths. During anonymous review, do not expose a public non-anonymous mirror containing
 byte-identical files or unique frozen hashes.
+
+The anonymous builder reads only hash-manifested files, excludes Git and GitHub metadata, writes
+an empty ZIP comment, normalizes timestamps and platform fields, and scans names, text, nested
+OOXML, and archive metadata. Repository CI and any future non-anonymous GitHub release workflow
+remain outside the anonymous package.
 
 ## Licence and intended use
 

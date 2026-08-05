@@ -1,7 +1,7 @@
 """Build public data exports from released FinExam-10K public JSON files.
 
-This script writes canonical JSON/JSONL, flat CSV tables, and summary CSVs.
-It is standard-library only and is used by CI to verify the public data path.
+This script writes canonical JSON/JSONL, flat CSV tables, summary CSVs, and a deterministic XLSX.
+It is used by CI to verify the complete public data path.
 """
 from __future__ import annotations
 
@@ -10,6 +10,10 @@ import csv
 import hashlib
 import json
 from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from data.xlsx_artifact import write_public_workbook  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "data"
@@ -97,7 +101,7 @@ def validate_rows(rows: list[dict]) -> None:
 def write_csv(path: Path, rows: list[dict], fields: list[str]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -209,7 +213,15 @@ def main() -> int:
     rows.sort(key=lambda row: row["id"])
     validate_rows(rows)
     out = args.out
+    if out.exists() and not out.is_dir():
+        raise SystemExit("public export output path is not a directory")
     out.mkdir(parents=True, exist_ok=True)
+
+    dictionary_rows = [{"field": key, "definition": definition} for key, definition in FIELD_DEFINITIONS]
+    stage_rows = stage_summary(rows)
+    difficulty_rows = difficulty_summary(rows)
+    model_rows = model_scores(rows)
+    intervention_rows = intervention_scores(rows)
 
     write_json(out / "finexam10k_public_5110_canonical.json", {
         "name": "finexam10k_public_5110_canonical",
@@ -220,11 +232,20 @@ def main() -> int:
     })
     write_jsonl(out / "finexam10k_public_5110_canonical.jsonl", rows)
     write_csv(out / "finexam10k_public_5110_table.csv", rows, PUBLIC_FIELDS)
-    write_csv(out / "data_dictionary.csv", [{"field": k, "definition": v} for k, v in FIELD_DEFINITIONS], ["field", "definition"])
-    write_csv(out / "stage_summary.csv", stage_summary(rows), ["program_stage", "items", "context_complete", "context_incomplete", "easy", "medium", "hard"])
-    write_csv(out / "difficulty_context_summary.csv", difficulty_summary(rows), ["difficulty", "items", "context_complete", "context_incomplete"])
-    write_csv(out / "model_public_scores.csv", model_scores(rows), ["model", "group", "items", "accuracy_percent", "parse_rate_percent"])
-    write_csv(out / "intervention_public_scores.csv", intervention_scores(rows), ["condition", "chain", "items", "accuracy_percent", "parse_rate_percent", "rescue_vs_direct", "harm_vs_direct", "delta_vs_direct_pp"])
+    write_csv(out / "data_dictionary.csv", dictionary_rows, ["field", "definition"])
+    write_csv(out / "stage_summary.csv", stage_rows, ["program_stage", "items", "context_complete", "context_incomplete", "easy", "medium", "hard"])
+    write_csv(out / "difficulty_context_summary.csv", difficulty_rows, ["difficulty", "items", "context_complete", "context_incomplete"])
+    write_csv(out / "model_public_scores.csv", model_rows, ["model", "group", "items", "accuracy_percent", "parse_rate_percent"])
+    write_csv(out / "intervention_public_scores.csv", intervention_rows, ["condition", "chain", "items", "accuracy_percent", "parse_rate_percent", "rescue_vs_direct", "harm_vs_direct", "delta_vs_direct_pp"])
+    write_public_workbook(
+        out / "finexam10k_public_5110.xlsx",
+        rows,
+        dictionary_rows,
+        stage_rows,
+        difficulty_rows,
+        model_rows,
+        intervention_rows,
+    )
 
     readme = f"""# Public FinExam-10K data exports
 
