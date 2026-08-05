@@ -1,0 +1,64 @@
+{
+  "reported_selectors": {
+    "gpt4o_pot": {
+      "artifact_sha256": "63adf13377a3e6aecc3c99f86777f70c3e82766b00647277b64de40d18033c44",
+      "retriever": "Contriever top-30",
+      "graph_relations": [
+        "shared_article_title",
+        "contriever_knn_k4"
+      ],
+      "expansion_hops": 1,
+      "candidate_cap": null,
+      "feature_count": 4,
+      "features": [
+        "reciprocal_rank",
+        "reciprocal_depth",
+        "edge_weight",
+        "degree_scale"
+      ],
+      "finance_reasoning_splits": [
+        "easy",
+        "medium"
+      ],
+      "reachable_labels": 511,
+      "train_dev_test": [
+        403,
+        66,
+        42
+      ],
+      "output_budget": "at_most_3"
+    },
+    "deepseek_r1_cot": {
+      "artifact_sha256": "1df4806a0c01518740df18ca723e9ee9b171615fda9ce780bebdb87e20cb5ab0",
+      "retriever": "BM25 top-30",
+      "graph_relations": [
+        "shared_normalized_input_or_output_quantity"
+      ],
+      "expansion_hops_nominal": 2,
+      "candidate_cap": 80,
+      "operational_note": "first hop reached the 80-candidate cap in audited runs",
+      "feature_count": 56,
+      "finance_reasoning_splits": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "reachable_labels": 890,
+      "train_dev_test": [
+        678,
+        106,
+        106
+      ],
+      "output_budget": "top_10"
+    }
+  },
+  "historical_unused_reference": {
+    "reachable_labels": 736,
+    "train_dev_test": [
+      560,
+      88,
+      88
+    ],
+    "status": "did_not_produce_any_reported_result"
+  }
+}

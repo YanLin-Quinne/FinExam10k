@@ -1,0 +1,37 @@
+{
+  "scope": "aggregate-only for the Full-Coverage and Context-Complete Reasoning Tracks",
+  "full_coverage": {
+    "n": 10198,
+    "cot_deepseek_r1": {
+      "direct_accuracy": 79.75,
+      "function_rag": {"accuracy": 79.43, "rescue": 505, "harm": 538, "delta_pp": -0.32, "mcnemar_p": 0.322},
+      "functiongraph_rag": {"accuracy": 79.84, "rescue": 509, "harm": 500, "delta_pp": 0.09, "mcnemar_p": 0.801}
+    },
+    "pot_gpt4o": {
+      "direct_accuracy": 69.37,
+      "function_rag": {"accuracy": 68.09, "rescue": 427, "harm": 557, "delta_pp": -1.27, "mcnemar_p": 0.0001},
+      "functiongraph_rag": {"accuracy": 68.06, "rescue": 527, "harm": 660, "delta_pp": -1.30, "mcnemar_p": 0.0001},
+      "branch_verifier": {"accuracy": 68.92, "rescue": 484, "harm": 530, "delta_pp": -0.45, "mcnemar_p": 0.158}
+    },
+    "judge_strata": [
+      {"retained": 0, "n": 7002, "function_rag_accuracy": 72.08, "functiongraph_accuracy": 70.98, "rescue": 310, "harm": 387, "delta_pp": -1.10, "mcnemar_p": 0.0040},
+      {"retained": 1, "n": 2225, "function_rag_accuracy": 60.31, "functiongraph_accuracy": 63.24, "rescue": 213, "harm": 148, "delta_pp": 2.92, "mcnemar_p": 0.0007},
+      {"retained": 2, "n": 479, "function_rag_accuracy": 55.53, "functiongraph_accuracy": 56.99, "rescue": 40, "harm": 33, "delta_pp": 1.46, "mcnemar_p": 0.483},
+      {"retained": 3, "n": 492, "function_rag_accuracy": 58.74, "functiongraph_accuracy": 59.15, "rescue": 31, "harm": 29, "delta_pp": 0.41, "mcnemar_p": 0.897}
+    ]
+  },
+  "context_complete": {
+    "n": 7625,
+    "cot_deepseek_r1": {
+      "direct_accuracy": 90.64,
+      "function_rag": {"accuracy": 90.32, "rescue": 199, "harm": 223, "delta_pp": -0.31, "mcnemar_p": 0.263},
+      "functiongraph_rag": {"accuracy": 90.87, "rescue": 213, "harm": 195, "delta_pp": 0.24, "mcnemar_p": 0.400}
+    },
+    "pot_gpt4o": {
+      "direct_accuracy": 80.60,
+      "function_rag": {"accuracy": 79.42, "rescue": 200, "harm": 290, "delta_pp": -1.18, "mcnemar_p": 0.0001},
+      "functiongraph_rag": {"accuracy": 78.91, "rescue": 252, "harm": 381, "delta_pp": -1.69, "mcnemar_p": 0.0001},
+      "branch_verifier": {"accuracy": 80.20, "rescue": 233, "harm": 264, "delta_pp": -0.41, "mcnemar_p": 0.178}
+    }
+  }
+}

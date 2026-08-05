@@ -1,0 +1,58 @@
+{
+  "scope": "exploratory aggregate diagnostics; per-item sequestered outputs are not released",
+  "post_execution_verification": {
+    "n": 369,
+    "flagged": 50,
+    "revised": 47,
+    "rescue": 11,
+    "harm": 10,
+    "delta_pp": 0.27,
+    "mcnemar_p": 1.0,
+    "bootstrap_ci_pp": [
+      -2.17,
+      2.71
+    ]
+  },
+  "answerability_detection": {
+    "n": 1199,
+    "confusion": {
+      "expert_answerable_pred_answerable": 280,
+      "expert_answerable_pred_unanswerable": 320,
+      "expert_unanswerable_pred_answerable": 4,
+      "expert_unanswerable_pred_unanswerable": 595
+    },
+    "accuracy": 72.98,
+    "precision_unanswerable": 65.03,
+    "recall_unanswerable": 99.33,
+    "f1_unanswerable": 78.6,
+    "selective_accuracy": 85.92,
+    "coverage": 23.7,
+    "random_matched_rate_accuracy": 57.56,
+    "random_trials": 4000,
+    "random_trials_reaching_observed": 0,
+    "false_positive_rate_on_answerable": 53.3,
+    "natural_prevalence_estimated_precision": 38.6,
+    "natural_prevalence_estimated_coverage": 35.1
+  },
+  "plan_then_solve": {
+    "n": 300,
+    "direct_accuracy": 50.0,
+    "plan_accuracy": 46.67,
+    "rescue": 42,
+    "harm": 52,
+    "delta_pp": -3.33,
+    "mcnemar_p": 0.3533,
+    "bootstrap_ci_pp": [
+      -9.67,
+      3.0
+    ],
+    "all_static_fail_n": 150,
+    "all_static_fail_accuracy": 28.0,
+    "all_static_fail_chance": 30.28,
+    "band_delta_pp": {
+      "easy": 26.92,
+      "medium": -7.14,
+      "hard": -25.61
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "scope": "released public partition, 5,110 items",
+  "n_items": 5110,
+  "fired": 373,
+  "fire_rate": 0.0729941292,
+  "decision_vector_order": "ascending opaque release id",
+  "decision_vector_sha256": "c3e95a147940ed04ec8dde232e2f82358291428aed484d86f49aad8ee0c479f1",
+  "item_id_set_sha256": "4a9320477de36093232b9f9f33e5b344a1f964a894f318d90e2d24b67f39f0c5",
+  "outcome": {
+    "always_direct_correct": 3470,
+    "routed_correct": 3524,
+    "direct_accuracy": 67.9060665,
+    "routed_accuracy": 68.9628180,
+    "rescue": 82,
+    "harm": 28,
+    "delta_pp": 1.0567515
+  }
+}

@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finexam10k-artifact"
+version = "0.1.0"
+description = "Offline public reproduction artifact for FinExam-10K"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "numpy==2.3.5",
+  "scipy==1.17.0",
+  "scikit-learn==1.8.0",
+  "matplotlib==3.10.8",
+]
+
+[tool.setuptools]
+packages = ["code", "code.analysis", "code.data", "code.diagnostics", "code.figures", "code.router", "code.selector", "code.tables"]

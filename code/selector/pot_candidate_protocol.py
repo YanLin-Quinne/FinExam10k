@@ -1,13 +1,9 @@
+"""One-hop PoT candidate expansion and four-feature scoring protocol."""
 from __future__ import annotations
 
 from typing import Any, Iterable
 
-try:
-    from .core import canonical_hash
-except ImportError as exc:                                  # pragma: no cover
-    from . import upstream_required
-    raise upstream_required("`core`") from exc
-
+from selector.core import canonical_hash
 
 FEATURE_NAMES = ("reciprocal_rank", "reciprocal_depth", "edge_weight", "degree_scale")
 FEATURE_SCHEMA_HASH = canonical_hash({"version": 1, "features": FEATURE_NAMES})
@@ -19,8 +15,8 @@ def stable_deduplicate(values: Iterable[str]) -> list[str]:
     for raw in values:
         value = str(raw)
         if value and value not in seen:
-            seen.add(value)
             result.append(value)
+            seen.add(value)
     return result
 
 
@@ -31,13 +27,17 @@ def candidate_id(candidate: dict[str, Any]) -> str:
 def feature_vector(candidate: dict[str, Any]) -> list[float]:
     rank = max(0, int(candidate.get("retrieval_rank", 0)))
     depth = max(0, int(candidate.get("graph_depth", 0)))
-    weight = float(candidate.get("edge_weight", 0.0))
+    edge_weight = float(candidate.get("edge_weight", 0.0))
     degree = max(0, int(candidate.get("graph_degree", 0)))
-    return [1.0 / (rank + 1), 1.0 / (depth + 1), weight, degree / (degree + 1)]
+    return [1.0 / (rank + 1), 1.0 / (depth + 1), edge_weight, degree / (degree + 1)]
 
 
-def expand_graph_candidates(top_candidates: list[dict[str, Any]], adjacency: dict[str, list[str]],
-                            catalog: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
+def expand_graph_candidates(
+    top_candidates: list[dict[str, Any]],
+    adjacency: dict[str, list[str]],
+    catalog: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Collect the top-30 roots followed by their unique one-hop neighbours."""
     result: list[dict[str, Any]] = []
     seen: set[str] = set()
     for rank, raw in enumerate(top_candidates):
@@ -55,15 +55,15 @@ def expand_graph_candidates(top_candidates: list[dict[str, Any]], adjacency: dic
     roots = list(result)
     for root in roots:
         root_id = candidate_id(root)
-        for neighbor_id in adjacency.get(root_id, []):
-            if neighbor_id in seen or neighbor_id not in catalog:
+        for neighbour_id in adjacency.get(root_id, []):
+            if neighbour_id in seen or neighbour_id not in catalog:
                 continue
-            item = dict(catalog[neighbor_id])
-            item["candidate_id"] = neighbor_id
+            item = dict(catalog[neighbour_id])
+            item["candidate_id"] = neighbour_id
             item.setdefault("retrieval_rank", int(root["retrieval_rank"]))
             item["graph_depth"] = 1
             item.setdefault("edge_weight", 1.0)
-            item.setdefault("graph_degree", len(adjacency.get(neighbor_id, [])))
+            item.setdefault("graph_degree", len(adjacency.get(neighbour_id, [])))
             result.append(item)
-            seen.add(neighbor_id)
+            seen.add(neighbour_id)
     return result

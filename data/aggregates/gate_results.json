@@ -1,0 +1,37 @@
+{
+  "scope": "aggregate-only; per-item held-out questions and predictions are sequestered",
+  "public_selection": {
+    "n": 5110,
+    "five_fold_oof_correct": 3518,
+    "five_fold_oof_accuracy": 68.8454,
+    "C": 0.5,
+    "threshold": 0.68,
+    "seed": 202607,
+    "feature_count": 27,
+    "fold_manifest": "data/router/public_cv_folds.json"
+  },
+  "heldout": {
+    "n": 5088,
+    "direct_accuracy": 70.83,
+    "functiongraph_accuracy": 69.73,
+    "gate_accuracy": 71.23,
+    "triggers": 404,
+    "rescue": 55,
+    "harm": 35,
+    "delta_pp": 0.3931,
+    "mcnemar_p": 0.0446,
+    "implied_branch_calls": 1.079
+  },
+  "heldout_context_complete": {
+    "n": 4219,
+    "direct_accuracy": 78.34,
+    "functiongraph_accuracy": 77.36,
+    "gate_accuracy": 78.88,
+    "triggers": 182,
+    "rescue": 31,
+    "harm": 8,
+    "delta_pp": 0.5452,
+    "mcnemar_p": 0.0003,
+    "implied_branch_calls": 1.043
+  }
+}

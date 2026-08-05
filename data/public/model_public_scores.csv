@@ -1,0 +1,18 @@
+model,group,items,accuracy_percent,parse_rate_percent
+DeepSeek-V4-Pro,Proprietary,5110,79.4325,99.7652
+Gemini-3.1-Pro,Proprietary,5110,82.2701,99.7456
+Claude-Sonnet-5,Proprietary,5110,77.2016,98.591
+DeepSeek-R1,Proprietary,5110,76.9667,99.9804
+gpt-oss-120b,Open-weight reasoning,5110,73.5225,99.9217
+Qwen3.7-Max,Proprietary,5110,72.2309,99.9804
+GPT-5.5,Proprietary,5110,71.1155,100.0
+gpt-oss-20b,Open-weight reasoning,5110,67.5538,97.6908
+GPT-4o,Proprietary,5110,67.6517,99.9804
+ODA-Fin-RL-8B,Finance-specialized,5110,66.5362,92.3679
+Fin-o1-14B,Finance-specialized,5110,63.8552,98.728
+DianJin-R1-32B,Finance-specialized,5110,63.229,95.6947
+Hawkish-8B,Finance-specialized,5110,51.9961,99.589
+Fin-R1-7B,Finance-specialized,5110,50.2348,87.7299
+gpt-5.6-sol,Proprietary,5110,81.546,100.0
+gpt-5.6-terra,Proprietary,5110,79.2368,100.0
+gpt-5.6-luna,Proprietary,5110,77.3386,99.9804

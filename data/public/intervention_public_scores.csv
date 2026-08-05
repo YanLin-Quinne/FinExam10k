@@ -1,0 +1,10 @@
+condition,chain,items,accuracy_percent,parse_rate_percent,rescue_vs_direct,harm_vs_direct,delta_vs_direct_pp
+pot_direct,pot,5110,67.9061,97.045,,,
+pot_function,pot,5110,66.5166,94.6967,228,299,-1.3894
+pot_graph,pot,5110,66.3992,96.4775,275,352,-1.5068
+pot_verifier,pot,5110,66.5166,94.6967,228,299,-1.3894
+cot_direct,cot,5110,76.9667,99.9804,,,
+cot_function_bm25,cot,5110,76.5362,99.9609,268,290,-0.4305
+cot_function_judge,cot,5110,76.184,99.9413,260,300,-0.7828
+cot_graph,cot,5110,76.5753,99.9609,262,282,-0.3914
+cot_graph_nojudge,cot,5110,76.2427,99.8826,264,301,-0.7241

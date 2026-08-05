@@ -1,28 +1,37 @@
 #!/usr/bin/env bash
-# One-click check. Offline, no GPU, under a minute.
-#
-# This runs the same things the CI workflow runs, in the same order: it compiles every file, runs
-# the self-test, and then actually executes the commands the README's Quick Start documents. The
-# last part is the point. Compiling and hashing a script proves nothing about whether it can read
-# what it needs, and an earlier revision of this bundle passed both while every documented command
-# failed on any machine but the curation one.
 set -euo pipefail
 cd "$(dirname "$0")"
 
-echo "== 1/4  every python file compiles =="
+TMP_ROOT="${TMPDIR:-/tmp}/finexam10k_public_repro"
+rm -rf "$TMP_ROOT"
+mkdir -p "$TMP_ROOT"
+
+echo "== 1/8 compile =="
 python -m compileall -q code tests
 
-echo "== 2/4  bundle self-test, 22 assertions =="
-python tests/test_bundle.py
+echo "== 2/8 unit tests =="
+python -m unittest discover -s tests -v
 
-echo "== 3/4  the documented quick start, actually executed =="
-( cd code/analysis && python why_hard372.py        >/dev/null && echo "  ok  why_hard372.py" )
-( cd code/analysis && python where_graph_wins.py   >/dev/null && echo "  ok  where_graph_wins.py" )
-( cd code/analysis && python rq2_error_analysis.py >/dev/null && echo "  ok  rq2_error_analysis.py" )
-( cd code/figures  && python make_taxonomy_figure.py >/dev/null && echo "  ok  make_taxonomy_figure.py" )
+echo "== 3/8 public data export path =="
+python code/data/build_public_exports.py --out "$TMP_ROOT/public_exports"
+python code/tables/make_public_tables.py --out "$TMP_ROOT/public_tables"
+python code/figures/make_public_figures.py --out "$TMP_ROOT/public_figures"
 
-echo "== 4/4  deterministic gate inference on the public partition =="
+echo "== 4/8 reproduce public gate selection =="
+python code/router/train_gate.py
+
+echo "== 5/8 deterministic public gate inference =="
 python code/router/gate_infer.py
 
-echo
+echo "== 6/8 selector audit =="
+python code/selector/audit_frozen.py
+
+echo "== 7/8 aggregate arithmetic =="
+python code/verify_aggregate_claims.py
+
+echo "== 8/8 public analysis smoke tests =="
+python code/diagnostics/difficulty_public.py >/dev/null
+python code/analysis/rq1_public_diagnostics.py >/dev/null
+python code/analysis/rq2_public.py >/dev/null
+
 echo "all checks passed"

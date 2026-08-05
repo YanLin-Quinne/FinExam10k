@@ -158,26 +158,27 @@
   <div class="eyebrow">Anonymous submission &middot; frozen response matrix</div>
   <h1>FinExam-10K Leaderboard</h1>
   <p class="thesis">10,198 <b>CFA and FRM aligned</b> examination items spanning all five
-  programme stages under one evaluation protocol. Seventeen frozen systems, one pass each,
-  temperature&nbsp;0. Items derive from CFA and FRM aligned preparatory materials available for
-  academic research. Official CFA Institute and GARP examination content is excluded, and neither
-  body is affiliated with or endorses this work.</p>
-  <p class="thesis" style="margin-top:13px">Four views of the same seventeen systems. Ranking on
-  the full corpus flatters everyone. <b>Restrict to items that are hard and answerable from their
-  own text, and fourteen of seventeen fall below chance.</b> Restrict once more and the ranking
-  stops existing.</p>
+  programme stages under one evaluation protocol. Seventeen frozen models answer each released
+  item once under the recorded evaluation configuration. Items derive from CFA- and FRM-aligned
+  preparatory materials available for academic research. Official CFA Institute and GARP
+  examination content is excluded, and neither body is affiliated with or endorses this work.</p>
+  <p class="thesis" style="margin-top:13px">The <b>Full-Coverage Track</b> preserves all 10,198
+  curated records for the maintained leaderboard. The <b>Context-Complete Reasoning Track</b>
+  isolates 7,625 records with locally attached answer-necessary evidence. On its 372-item Hard
+  subset, fourteen of seventeen models fall below item-weighted chance; the universal-failure core
+  is missed by every model.</p>
   <div class="strip" id="strip"></div>
 </header>
 
 <div class="views" role="group" aria-label="Choose item set">
   <button class="view" data-v="full" aria-pressed="true">
-    <span class="vn">Full corpus</span><span class="vm">10,198 items</span></button>
+    <span class="vn">Full-Coverage Track</span><span class="vm">10,198 items</span></button>
   <button class="view" data-v="cc" aria-pressed="false">
-    <span class="vn">Context-complete</span><span class="vm">7,625 items</span></button>
+    <span class="vn">Context-Complete Reasoning Track</span><span class="vm">7,625 items</span></button>
   <button class="view" data-v="h372" aria-pressed="false">
-    <span class="vn">Hard &amp; context-complete</span><span class="vm">372 items</span></button>
+    <span class="vn">Context-Complete Hard</span><span class="vm">372 items</span></button>
   <button class="view" data-v="z188" aria-pressed="false">
-    <span class="vn">Zero-solve</span><span class="vm">188 items</span></button>
+    <span class="vn">Universal-failure core</span><span class="vm">188 items</span></button>
 </div>
 
 <div class="bar-row">
@@ -196,23 +197,24 @@
 <div class="scroll"><table id="tb"><thead><tr id="th"></tr></thead><tbody></tbody></table></div>
 
 <footer>
-  <p><b>What the four views are.</b> <i>Full corpus</i> is every item. <i>Context-complete</i>
-  drops the items whose stem refers to a table or shared vignette that was an image in the source
-  and was therefore not extracted, so a failure there cannot be blamed on absent background.
-  <i>Hard and context-complete</i> is the intersection of that set with the hard band, and it is
-  the cleanest difficulty evidence the benchmark has. <i>Zero-solve</i> is the set no system in
-  the panel answered correctly.</p>
-  <p><b>Difficulty.</b> Bands come from the consensus of these same seventeen systems, balanced
-  across the two access modes so that the ten API-served and seven locally-served systems weigh
-  equally. Thresholds are two thirds and one third. A band is a property of the item, so
-  restricting to any subset never moves an item between bands.</p>
-  <p><b>Protocol.</b> One pass per system, temperature 0, top-p 1, seed 202607, 32,768 token
-  context, 8,192 token completion limit. Reasoning effort differs across systems where the
-  provider exposes it, so the ranking is not an equal-conditions capability comparison. Responses
-  from which no option letter could be parsed are scored as incorrect.</p>
-  <p><b>Splits.</b> 5,110 mock and practice items are released. 5,088 real-examination items are
-  held out and not distributed. Both halves follow the same filtering, reannotation and scoring
-  procedure. Author, institution and repository identifiers withheld for review.</p>
+  <p><b>What the four views are.</b> The <i>Full-Coverage Track</i> contains every curated item and
+  supports the maintained leaderboard. The <i>Context-Complete Reasoning Track</i> excludes records
+  detached from answer-necessary parent-level vignettes, tables, figures, images, or exhibits and
+  is the primary evidence base for reasoning from the supplied record. <i>Context-Complete Hard</i>
+  is its intersection with the frozen Hard band. The <i>universal-failure core</i> contains the 188
+  items answered incorrectly by all seventeen models; 47 retain complete local context.</p>
+  <p><b>Difficulty.</b> Bands come from the consensus of the same seventeen models, balanced across
+  the two deployment groups so that the ten API-served and seven locally-served models weigh
+  equally. Thresholds are two thirds and one third. A band is frozen per item, so restricting to
+  either evaluation track never moves an item between bands.</p>
+  <p><b>Protocol.</b> Each model receives the common multiple-choice prompt under the recorded
+  deterministic or closest available provider configuration. Exact checkpoint, decoding, context,
+  and completion settings are reported in the paper and release manifests. Responses from which no
+  valid option letter can be extracted are scored as incorrect.</p>
+  <p><b>Splits.</b> 5,110 mock and practice items are released. The remaining 5,088 held-out items
+  are not distributed and are evaluated through the leaderboard protocol. Both partitions follow
+  the same filtering, reannotation, and scoring procedure. Author, institution, and repository
+  identifiers are withheld for anonymous review.</p>
 </footer>
 </div>
 <script>
@@ -226,27 +228,27 @@ const TAG = {
 const STAGES = ["Level I", "Level II", "Level III", "Part I", "Part II"];
 const META = {
   full: {
-    title: "Full corpus",
-    sub: "Accuracy by examination stage over every item. <b>Acc*</b> is chance-normalised, since CFA aligned items carry three options and FRM aligned items four.",
+    title: "Full-Coverage Track",
+    sub: "Accuracy by examination stage over all 10,198 curated items. <b>Acc*</b> is chance-normalised because CFA-aligned items have three options and FRM-aligned items have four.",
     note: "",
     cols: "stages"
   },
   cc: {
-    title: "Context-complete subset",
-    sub: "The 7,625 items answerable from their own text. Dropping items that point at background the release does not carry lifts every system, which is the point: those failures were a property of the data rather than of the reasoning.",
+    title: "Context-Complete Reasoning Track",
+    sub: "The 7,625 items whose supplied record contains all answer-necessary evidence. Model ordering remains nearly unchanged, while higher absolute scores show that detached parent context amplifies failure without explaining the remaining reasoning difficulty.",
     note: "",
     cols: "stages"
   },
   h372: {
-    title: "Hard and context-complete",
-    sub: "The 372 hard-band items an adjudicator judged answerable from their own text. A failure here cannot be blamed on a table or vignette that was never extracted.",
+    title: "Context-Complete Hard",
+    sub: "The 372 frozen Hard items whose supplied record contains all answer-necessary evidence. This slice removes detached-parent-context as an explanation for the observed errors.",
     note: "<b>Fourteen of seventeen score below the 30.40 percent chance rate.</b> Rows under the dashed line do worse than guessing on items that are fully answerable as written.",
     cols: "compact"
   },
   z188: {
-    title: "Zero-solve",
-    sub: "The 188 items no system in the frozen panel answered correctly.",
-    note: "<b>Accuracy is 0.00 for every system by construction</b>, so this view is not a ranking. What it shows is where the systems went instead. <b>Agree</b> is how often a system picked the option the panel most often picked, and on 41 of these items all seventeen converged on one wrong option. Difficulty alone would scatter answers toward chance. Converging below chance points at a shared misconception.",
+    title: "Universal-failure core",
+    sub: "The 188 items answered incorrectly by every model in the frozen panel; 47 have complete local context.",
+    note: "<b>Accuracy is 0.00 for every model by construction</b>, so this view is diagnostic rather than a ranking. <b>Agree</b> is how often a model selected the panel's modal option. On 41 items all seventeen models selected the same wrong option. This concentration is consistent with shared error patterns, but it does not by itself establish one common causal mechanism.",
     cols: "diag"
   }
 };
