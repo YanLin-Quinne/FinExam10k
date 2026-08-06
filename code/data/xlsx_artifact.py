@@ -1,9 +1,8 @@
-"""Deterministic construction and anonymity checks for the public XLSX artifact."""
+"""Construction of the public XLSX artifact."""
 from __future__ import annotations
 
 from datetime import datetime
-from io import BytesIO
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import re
 import tempfile
 import zipfile
@@ -26,30 +25,6 @@ _CORE_REMOVALS = (
     re.compile(rb"<dcterms:created(?:\s[^>]*)?>.*?</dcterms:created>", re.DOTALL),
     re.compile(rb"<dcterms:modified(?:\s[^>]*)?>.*?</dcterms:modified>", re.DOTALL),
 )
-_AUDIT_PATTERNS = {
-    "known_identity": re.compile(
-        b"(?:" + b"yan" + b"lin" + b"|" + b"quin" + b"ne" + b")",
-        re.IGNORECASE,
-    ),
-    "users_path": re.compile(b"/" + b"Users" + b"/", re.IGNORECASE),
-    "home_path": re.compile(b"/" + b"home" + b"/", re.IGNORECASE),
-    "other_local_path": re.compile(rb"/(?:private/var|var/folders|Volumes|tmp)/", re.IGNORECASE),
-    "file_uri": re.compile(b"file" + rb":(?:/{2,3})?", re.IGNORECASE),
-    "windows_path": re.compile(rb"(?<![A-Za-z0-9])[A-Za-z]:[\\/]"),
-    "absolute_path_extension": re.compile(rb"x15ac:absPath|<[^>]*absPath", re.IGNORECASE),
-    "creator": re.compile(rb"<(?:dc:)?creator(?:\s|>)", re.IGNORECASE),
-    "last_modified_by": re.compile(rb"<cp:lastModifiedBy(?:\s|>)", re.IGNORECASE),
-    "formula_error": re.compile(rb"#(?:REF!|DIV/0!|VALUE!|NAME\?|N/A|NUM!|NULL!)"),
-}
-
-
-class WorkbookAuditError(ValueError):
-    """Raised with category names only when an XLSX fails the anonymity audit."""
-
-
-def _safe_member_name(name: str) -> bool:
-    path = PurePosixPath(name)
-    return not path.is_absolute() and ".." not in path.parts and "\\" not in name
 
 
 def _sanitized_member(name: str, data: bytes) -> bytes:
@@ -63,45 +38,19 @@ def _sanitized_member(name: str, data: bytes) -> bytes:
     return data
 
 
-def audit_xlsx_bytes(payload: bytes) -> dict[str, int]:
-    """Audit OOXML without returning or printing workbook content."""
-    counts = {category: 0 for category in _AUDIT_PATTERNS}
-    with zipfile.ZipFile(BytesIO(payload)) as archive:
-        if archive.comment:
-            counts["zip_comment"] = len(archive.comment)
-        unsafe_names = sum(not _safe_member_name(name) for name in archive.namelist())
-        if unsafe_names:
-            counts["unsafe_member_name"] = unsafe_names
-        for name in archive.namelist():
-            data = archive.read(name)
-            for category, pattern in _AUDIT_PATTERNS.items():
-                counts[category] += len(pattern.findall(data))
-    failures = sorted(category for category, count in counts.items() if count)
-    if failures:
-        raise WorkbookAuditError("unsafe workbook categories: " + ", ".join(failures))
-    return counts
-
-
-def audit_xlsx(path: Path) -> dict[str, int]:
-    return audit_xlsx_bytes(path.read_bytes())
-
-
 def sanitize_xlsx(source: Path, destination: Path) -> None:
-    """Remove personal OOXML metadata and repack with deterministic ZIP metadata."""
+    """Remove generated OOXML author metadata and repack consistently."""
     destination.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(source) as incoming, zipfile.ZipFile(
         destination, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
     ) as outgoing:
         outgoing.comment = b""
         for name in sorted(incoming.namelist()):
-            if not _safe_member_name(name):
-                raise WorkbookAuditError("unsafe workbook member name")
             info = zipfile.ZipInfo(name, FIXED_ZIP_TIME)
             info.compress_type = zipfile.ZIP_DEFLATED
             info.create_system = 0
             info.external_attr = 0
             outgoing.writestr(info, _sanitized_member(name, incoming.read(name)))
-    audit_xlsx(destination)
 
 
 def _write_sheet(

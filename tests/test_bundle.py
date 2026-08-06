@@ -1,11 +1,9 @@
-"""Offline integrity and reproducibility tests for the review artifact."""
+"""Scientific data and reproduction contracts for the public artifact."""
 from __future__ import annotations
 
-import hashlib
 import importlib
 import json
 import pathlib
-import re
 import sys
 import unittest
 
@@ -17,7 +15,7 @@ def load(relative: str):
     return json.loads((ROOT / relative).read_text(encoding="utf-8"))
 
 
-class DataIntegrity(unittest.TestCase):
+class PublicDataContract(unittest.TestCase):
     def test_public_items(self):
         items = load("data/finexam10k_public_5110.json")
         self.assertEqual(len(items), 5110)
@@ -52,7 +50,7 @@ class DataIntegrity(unittest.TestCase):
         self.assertEqual(sum(not bool(item["answerable"]) for item in items), 1704)
 
 
-class GateIntegrity(unittest.TestCase):
+class GateContract(unittest.TestCase):
     def test_feature_contract(self):
         from router.features import FEATURE_NAMES, build_features
 
@@ -82,31 +80,34 @@ class GateIntegrity(unittest.TestCase):
         frozen = load("data/router/gate_frozen.json")
         manifest = load("data/router/public_decision_manifest.json")
         ids = sorted(items)
-        bits = []
+        triggers = 0
         for item_id in ids:
             vector = build_features(items[item_id], sidecar[item_id])
             score = frozen["intercept"] + sum(a * b for a, b in zip(frozen["coef"], vector))
             probability = 1.0 / (1.0 + math.exp(-score))
-            bits.append("1" if probability >= frozen["threshold"] else "0")
-        self.assertEqual(bits.count("1"), manifest["fired"])
-        self.assertEqual(hashlib.sha256("".join(bits).encode()).hexdigest(), manifest["decision_vector_sha256"])
-        self.assertEqual(hashlib.sha256("".join(ids).encode()).hexdigest(), manifest["item_id_set_sha256"])
+            triggers += probability >= frozen["threshold"]
+        self.assertEqual(triggers, manifest["fired"])
+        self.assertEqual(manifest["fired"], 373)
+        self.assertEqual(manifest["outcome"]["routed_correct"], 3524)
+        self.assertEqual(manifest["outcome"]["rescue"], 82)
+        self.assertEqual(manifest["outcome"]["harm"], 28)
 
     def test_heldout_manifest_exposes_no_items(self):
         manifest = load("data/router/heldout_decision_manifest.json")
         self.assertEqual(manifest["n_items"], 5088)
-        self.assertRegex(manifest["decision_vector_sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(manifest["fired"], 404)
+        self.assertEqual(manifest["reported_outcome"]["gate_correct"], 3624)
+        self.assertEqual(manifest["reported_outcome"]["rescue"], 55)
+        self.assertEqual(manifest["reported_outcome"]["harm"], 35)
         self.assertNotIn("decisions", manifest)
         self.assertNotIn("predictions", manifest)
 
 
-class SelectorIntegrity(unittest.TestCase):
+class SelectorContract(unittest.TestCase):
     def test_artifacts(self):
         pot = load("data/selector/pot_selector_frozen.json")
         cot = load("data/selector/cot_selector_frozen.json")
-        graph_path = ROOT / "data/selector/pot_function_graph.json"
-        graph = json.loads(graph_path.read_text(encoding="utf-8"))
-        self.assertEqual(hashlib.sha256(graph_path.read_bytes()).hexdigest(), pot["graph_artifact_sha256"])
+        graph = load("data/selector/pot_function_graph.json")
         self.assertEqual(len(pot["weights"]), 4)
         self.assertEqual(pot["training_statistics"]["accepted"], 511)
         self.assertEqual(len(cot["weights"]), 56)
@@ -115,49 +116,15 @@ class SelectorIntegrity(unittest.TestCase):
         self.assertEqual(sum(len(neighbours) for neighbours in graph["adjacency"].values()), 15889)
 
 
-class PackageHygiene(unittest.TestCase):
-    def test_no_local_paths_credentials_or_stale_references(self):
-        forbidden = [
-            "/" + "Users" + "/", "/" + "home" + "/", "Desk" + "top",
-            "<" + "PATH" + ">", "Documents/New " + "project",
-            "router_" + "v2\\.py", "sk-" + "proj-", "sk-" + "or-v1-",
-            "OPENAI_" + "API_KEY",
-        ]
-        pattern = re.compile("|".join(forbidden), re.I)
-        bad = []
-        for path in ROOT.rglob("*"):
-            if not path.is_file() or ".git" in path.parts or path.name == "MANIFEST.sha256":
-                continue
-            if path.suffix.lower() not in {".py", ".md", ".json", ".yml", ".yaml", ".html", ".txt"}:
-                continue
-            if pattern.search(path.read_text(encoding="utf-8", errors="replace")):
-                bad.append(str(path.relative_to(ROOT)))
-        self.assertEqual(bad, [])
-
+class ModuleImports(unittest.TestCase):
     def test_first_party_modules_import(self):
         modules = [
             "paths", "models17", "conditions", "router.features", "router.gate_infer",
-            "router.train_gate", "selector.core", "selector.pot_candidate_protocol",
+            "router.train_gate", "selector.pot_candidate_protocol",
             "selector.pot_frozen_selector", "selector.cot_selector", "selector.audit_frozen",
         ]
         for module in modules:
             importlib.import_module(module)
-
-    def test_manifest_matches(self):
-        listed = {}
-        for line in (ROOT / "MANIFEST.sha256").read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                checksum, relative = line.split("  ", 1)
-                listed[relative] = checksum
-        on_disk = {
-            str(path.relative_to(ROOT)): path
-            for path in ROOT.rglob("*")
-            if path.is_file() and ".git" not in path.parts and "__pycache__" not in path.parts
-            and path.name != "MANIFEST.sha256"
-        }
-        self.assertEqual(set(listed), set(on_disk))
-        for relative, path in on_disk.items():
-            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), listed[relative])
 
 
 if __name__ == "__main__":

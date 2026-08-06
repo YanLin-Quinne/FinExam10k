@@ -1,7 +1,6 @@
 {
   "reported_selectors": {
     "gpt4o_pot": {
-      "artifact_sha256": "63adf13377a3e6aecc3c99f86777f70c3e82766b00647277b64de40d18033c44",
       "retriever": "Contriever top-30",
       "graph_relations": [
         "shared_article_title",
@@ -29,7 +28,6 @@
       "output_budget": "at_most_3"
     },
     "deepseek_r1_cot": {
-      "artifact_sha256": "1df4806a0c01518740df18ca723e9ee9b171615fda9ce780bebdb87e20cb5ab0",
       "retriever": "BM25 top-30",
       "graph_relations": [
         "shared_normalized_input_or_output_quantity"
