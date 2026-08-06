@@ -22157,17 +22157,13 @@
   ]
  },
  "artifact_kind": "bupt_function_graph",
- "artifact_sha256": "e5cb6e0cf0b1a3b14ee3e292c9566ed93763407baba4a2a021fd820d230c0feb",
- "function_catalog_hash": "da60dc5b8c81e3bca9e98da2f5a58d83f46bb34e77de3b2d43a4ff9553e6bbc6",
  "provenance": {
   "builder": "shared_article_title_union_contriever_knn; CLS pooling; no explicit L2 normalisation; inner product; corpus only, no FinExam or answer signal",
   "finexam_overlap_audit": {
    "count": 0,
    "method": "code_computed_id_intersection"
   },
-  "source_commit": "b0fe6455396f831955e4eb988472b4a563403bc5",
-  "source_dataset": "BUPT FinanceReasoning",
-  "source_sha256": "1c1d11ef6173208da0014b6bbb71cc8e2aa2683da9ba1ada4bf9e593fb4c7293"
+  "source_dataset": "BUPT FinanceReasoning"
  },
  "schema_version": 1
 }

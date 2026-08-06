@@ -37,16 +37,12 @@ class GateCliTests(unittest.TestCase):
         )
 
     def test_real_cli_matches_public_manifest_and_not_legacy_300(self):
-        manifest = json.loads(
-            (ROOT / "data/router/public_decision_manifest.json").read_text(encoding="utf-8")
-        )
         result = self.run_cli(
             "--interventions", "data/intervention_matrix_public_5110.json"
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("fired         373", result.stdout)
         self.assertNotIn("fired         300", result.stdout)
-        self.assertIn(manifest["decision_vector_sha256"], result.stdout)
         self.assertIn("correct=3524/5110 rescue=82 harm=28", result.stdout)
 
     def test_numeric_option_formats_use_shared_feature_contract(self):

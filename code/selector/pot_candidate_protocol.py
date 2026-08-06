@@ -3,10 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Iterable
 
-from selector.core import canonical_hash
-
 FEATURE_NAMES = ("reciprocal_rank", "reciprocal_depth", "edge_weight", "degree_scale")
-FEATURE_SCHEMA_HASH = canonical_hash({"version": 1, "features": FEATURE_NAMES})
 
 
 def stable_deduplicate(values: Iterable[str]) -> list[str]:
