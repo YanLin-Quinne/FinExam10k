@@ -3,44 +3,34 @@
   "context_incomplete": 1704,
   "files": {
     "README.md": {
-      "bytes": 1126,
-      "sha256": "98c0a222b9c9459f2485f92b4d63559bb92dd975381fdffea1df6fe82a62c69b"
+      "bytes": 1126
     },
     "data_dictionary.csv": {
-      "bytes": 1096,
-      "sha256": "9400c4f348a812e2e6f614ac8a08ffb49d149e54c992f13f69dda1281d6760ef"
+      "bytes": 1096
     },
     "difficulty_context_summary.csv": {
-      "bytes": 109,
-      "sha256": "a584df2db7a103f1a474aa51e1a4e89c59569a07fc9013de1e4a3cb284418b3f"
+      "bytes": 109
     },
     "finexam10k_public_5110.xlsx": {
-      "bytes": 2484225,
-      "sha256": "30ceb76e517d11d3c910dd5f81ef9d93238dca1c76201aa3aa8426f04025b1ac"
+      "bytes": 2484225
     },
     "finexam10k_public_5110_canonical.json": {
-      "bytes": 10259287,
-      "sha256": "8bd3acc4db54e3599b1ee25db191fe33c6f360e31b0ff6e86897173fd651e117"
+      "bytes": 10259287
     },
     "finexam10k_public_5110_canonical.jsonl": {
-      "bytes": 9620046,
-      "sha256": "8949d9de48d7135dc07c0db418f36a4c7de85342ea3a3fd8b6c004fb6c39f2e1"
+      "bytes": 9620046
     },
     "finexam10k_public_5110_table.csv": {
-      "bytes": 7938724,
-      "sha256": "5354b06920123492abf92e6622f81415d03103e001af0c15b94ba599a947a692"
+      "bytes": 7938724
     },
     "intervention_public_scores.csv": {
-      "bytes": 573,
-      "sha256": "9798d4e2bc00a93b49af10e785c05cf83dc9509dc2bfa7a6ffba13ee262a3d5e"
+      "bytes": 573
     },
     "model_public_scores.csv": {
-      "bytes": 875,
-      "sha256": "a15d5b750d0a38cfb1714c0f4dea6e848be0bacb09d7f8ed23609b29376b28d8"
+      "bytes": 875
     },
     "stage_summary.csv": {
-      "bytes": 250,
-      "sha256": "c076cc186d5afba15b8c2b9d1119f1fe2c8a1f3ffbf27de91a443ae6fff9fb87"
+      "bytes": 250
     }
   },
   "record_count": 5110

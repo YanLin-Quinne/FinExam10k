@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="FinExam-10K benchmark results for professional financial reasoning.">
+  <title>FinExam-10K Leaderboard</title>
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#leaderboard">Skip to leaderboard</a>
+  <header class="site-header">
+    <a class="wordmark" href="#top">FinExam-10K</a>
+    <nav aria-label="Primary navigation">
+      <a href="#leaderboard">Leaderboard</a><a href="#methods">Methods</a>
+      <a href="#dataset">Dataset</a><a href="#about">About</a>
+    </nav>
+  </header>
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="eyebrow">ACL benchmark artifact</p>
+      <h1 id="hero-title">Professional finance reasoning, measured at scale.</h1>
+      <p class="lede">FinExam-10K evaluates 17 language models on 10,198 expert-reviewed,
+        CFA- and FRM-aligned items, with empirical difficulty and context-completeness annotations.</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="#leaderboard">Explore results</a>
+        <a class="button" href="../README.md">Reviewer guide</a>
+      </div>
+      <dl class="facts" aria-label="Benchmark summary">
+        <div><dt>Items</dt><dd>10,198</dd></div><div><dt>Systems</dt><dd>17</dd></div>
+        <div><dt>Public records</dt><dd>5,110</dd></div><div><dt>Held-out records</dt><dd>5,088</dd></div>
+      </dl>
+    </section>
+
+    <section id="leaderboard" class="section" aria-labelledby="leaderboard-title">
+      <div class="section-heading"><div><p class="eyebrow">Aggregate results</p>
+        <h2 id="leaderboard-title">Model leaderboard</h2></div>
+        <p id="results-status" class="status" aria-live="polite">Loading results…</p></div>
+      <div class="controls" aria-label="Leaderboard filters">
+        <label>Benchmark view<select id="view-filter">
+          <option value="full">Full Coverage</option><option value="cc">Context Complete</option>
+          <option value="h372">Context Complete Hard</option><option value="z188">Universal Failure Core</option>
+        </select></label>
+        <label>Model category<select id="category-filter"><option value="all">All categories</option></select></label>
+        <label>Find a model<input id="model-search" type="search" autocomplete="off" placeholder="Search model names"></label>
+      </div>
+      <div class="view-summary"><div><h3 id="view-title">Full Coverage</h3><p id="view-description"></p></div>
+        <dl class="view-stats"><div><dt>Items</dt><dd id="view-items">—</dd></div>
+          <div><dt>Chance</dt><dd id="view-chance">—</dd></div>
+          <div><dt>Below chance</dt><dd id="view-below">—</dd></div></dl></div>
+      <div class="table-shell" tabindex="0" aria-label="Scrollable leaderboard">
+        <table>
+          <caption>Accuracy by model and examination stage. Select a column heading to sort.</caption>
+          <thead><tr>
+            <th scope="col">Rank</th>
+            <th scope="col" aria-sort="none"><button data-sort="model">Model</button></th>
+            <th scope="col" aria-sort="none"><button data-sort="category">Category</button></th>
+            <th scope="col" aria-sort="none"><button data-sort="CFA Level I">CFA I</button></th>
+            <th scope="col" aria-sort="none"><button data-sort="CFA Level II">CFA II</button></th>
+            <th scope="col" aria-sort="none"><button data-sort="CFA Level III">CFA III</button></th>
+            <th scope="col" aria-sort="none"><button data-sort="FRM Part I">FRM I</button></th>
+            <th scope="col" aria-sort="none"><button data-sort="FRM Part II">FRM II</button></th>
+            <th scope="col" aria-sort="descending"><button data-sort="accuracy">Accuracy</button></th>
+            <th scope="col" aria-sort="none"><button data-sort="adjusted_accuracy">Acc*</button></th>
+          </tr></thead><tbody id="leaderboard-body"></tbody>
+        </table>
+      </div>
+      <p class="table-note"><strong>Acc*</strong> adjusts for three-option CFA and four-option FRM
+        chance rates. Rankings are descriptive aggregate results, not live submissions.</p>
+    </section>
+
+    <section id="methods" class="section" aria-labelledby="methods-title">
+      <p class="eyebrow">Interventions</p><h2 id="methods-title">What the benchmark compares</h2>
+      <div class="method-grid">
+        <article><h3>Direct</h3><p>The model answers from the item as supplied, without function retrieval.</p></article>
+        <article><h3>Function-RAG</h3><p>A retriever selects FinanceReasoning functions as structured support.</p></article>
+        <article><h3>FunctionGraph-RAG</h3><p>Retrieval expands through relations between functions before frozen selection.</p></article>
+        <article><h3>FunctionGraph-RAG + Verifier</h3><p>A post-execution verifier checks the selected PoT branch before finalizing its answer.</p></article>
+        <article><h3>Selective Branch Router</h3><p>A frozen public-trained pre-execution gate decides whether to invoke FunctionGraph-RAG after Direct and before branch execution. It never sees the gold answer or branch outcome.</p></article>
+      </div>
+    </section>
+
+    <section id="dataset" class="section split" aria-labelledby="dataset-title">
+      <div><p class="eyebrow">Public data</p><h2 id="dataset-title">5,110 released records</h2></div>
+      <div><p>The public partition includes canonical fields, difficulty, context annotations, and equivalent exports.</p>
+        <ul class="dataset-links">
+          <li><a href="../data/public/finexam10k_public_5110_canonical.json">JSON</a></li>
+          <li><a href="../data/public/finexam10k_public_5110_canonical.jsonl">JSONL</a></li>
+          <li><a href="../data/public/finexam10k_public_5110_table.csv">CSV</a></li>
+          <li><a href="../data/public/finexam10k_public_5110.xlsx">XLSX</a></li>
+        </ul></div>
+    </section>
+    <section id="about" class="section split" aria-labelledby="about-title">
+      <div><p class="eyebrow">Research scope</p><h2 id="about-title">Transfer, then test</h2></div>
+      <div><p>The retrieval structures and selectors are transferred from FinanceReasoning.
+        FinExam-10K tests whether those frozen mechanisms improve professional examination reasoning.</p>
+        <p>Only aggregate held-out results appear here. Private records and per-item predictions are not loaded.</p></div>
+    </section>
+  </main>
+  <footer>FinExam-10K is an independent academic benchmark.</footer>
+</body>
+</html>

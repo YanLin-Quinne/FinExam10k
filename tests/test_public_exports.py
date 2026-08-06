@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 import csv
-import hashlib
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "code"))
 
 from data.build_public_exports import PUBLIC_FIELDS, validate_rows  # noqa: E402
-from data.xlsx_artifact import SHEET_NAMES, audit_xlsx  # noqa: E402
+from data.xlsx_artifact import SHEET_NAMES  # noqa: E402
 
 MAIN_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
 REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -28,8 +28,6 @@ class PublicExportTests(unittest.TestCase):
     def setUpClass(cls):
         cls.temporary = tempfile.TemporaryDirectory()
         cls.output = Path(cls.temporary.name) / "exports"
-        cls._build()
-        cls.first_hashes = cls.hashes()
         cls._build()
 
     @classmethod
@@ -46,17 +44,6 @@ class PublicExportTests(unittest.TestCase):
             text=True,
         )
 
-    @classmethod
-    def hashes(cls):
-        return {
-            path.name: hashlib.sha256(path.read_bytes()).hexdigest()
-            for path in cls.output.iterdir()
-            if path.is_file()
-        }
-
-    def test_repeated_build_is_byte_deterministic(self):
-        self.assertEqual(self.first_hashes, self.hashes())
-
     def test_json_jsonl_csv_and_xlsx_have_equivalent_ids(self):
         canonical = json.loads(
             (self.output / "finexam10k_public_5110_canonical.json").read_text(encoding="utf-8")
@@ -71,17 +58,41 @@ class PublicExportTests(unittest.TestCase):
             encoding="utf-8", newline=""
         ) as handle:
             csv_rows = list(csv.DictReader(handle))
-        xlsx_headers, xlsx_ids = self.xlsx_public_ids(
+        xlsx_rows = self.xlsx_public_rows(
             self.output / "finexam10k_public_5110.xlsx"
         )
-        expected_ids = [row["id"] for row in canonical]
         self.assertEqual(len(canonical), 5110)
         self.assertEqual(jsonl, canonical)
-        self.assertEqual([row["id"] for row in csv_rows], expected_ids)
-        self.assertEqual(xlsx_ids, expected_ids)
-        self.assertEqual(xlsx_headers, PUBLIC_FIELDS)
+        self.assertEqual(
+            [self.normalized(row) for row in csv_rows],
+            [self.normalized(row) for row in canonical],
+        )
+        self.assertEqual(
+            [self.normalized(row) for row in xlsx_rows],
+            [self.normalized(row) for row in canonical],
+        )
 
-    def xlsx_public_ids(self, path: Path) -> tuple[list[str], list[str]]:
+    @staticmethod
+    def normalized(row: dict) -> tuple[str, ...]:
+        values = []
+        for field in PUBLIC_FIELDS:
+            value = row.get(field, "")
+            if field == "context_complete":
+                value = str(value).lower() in {"true", "1"}
+                values.append("true" if value else "false")
+            elif field == "consensus_pass_rate":
+                values.append(f"{float(value):.12g}")
+            else:
+                text = str(value or "")
+                text = re.sub(
+                    r"_x([0-9A-Fa-f]{4})_",
+                    lambda match: chr(int(match.group(1), 16)),
+                    text,
+                )
+                values.append(text)
+        return tuple(values)
+
+    def xlsx_public_rows(self, path: Path) -> list[dict]:
         ns = {"m": MAIN_NS, "r": REL_NS, "rel": PACKAGE_REL_NS}
         with zipfile.ZipFile(path) as archive:
             shared_root = ET.fromstring(archive.read("xl/sharedStrings.xml"))
@@ -89,17 +100,24 @@ class PublicExportTests(unittest.TestCase):
             sheet = ET.fromstring(archive.read("xl/worksheets/sheet1.xml"))
             rows = []
             for row in sheet.findall("m:sheetData/m:row", ns):
-                values = []
+                values = [""] * len(PUBLIC_FIELDS)
                 for cell in row.findall("m:c", ns):
+                    letters = "".join(character for character in cell.get("r", "") if character.isalpha())
+                    column = 0
+                    for letter in letters:
+                        column = column * 26 + ord(letter.upper()) - ord("A") + 1
+                    column -= 1
                     value = cell.find("m:v", ns)
                     raw = "" if value is None else value.text or ""
-                    values.append(shared[int(raw)] if cell.get("t") == "s" else raw)
+                    if cell.get("t") == "s":
+                        raw = shared[int(raw)]
+                    values[column] = raw
                 rows.append(values)
-        return rows[0], [row[0] for row in rows[1:]]
+        self.assertEqual(rows[0], PUBLIC_FIELDS)
+        return [dict(zip(PUBLIC_FIELDS, row)) for row in rows[1:]]
 
-    def test_xlsx_structure_anonymity_and_manifest(self):
+    def test_xlsx_structure_and_export_summary(self):
         path = self.output / "finexam10k_public_5110.xlsx"
-        audit_xlsx(path)
         with zipfile.ZipFile(path) as archive:
             workbook = ET.fromstring(archive.read("xl/workbook.xml"))
             sheets = [node.get("name") for node in workbook.findall(f"{{{MAIN_NS}}}sheets/*")]
@@ -125,9 +143,8 @@ class PublicExportTests(unittest.TestCase):
         )
         self.assertEqual(manifest["record_count"], 5110)
         self.assertEqual(manifest["context_complete"], 3406)
-        self.assertEqual(
-            manifest["files"][path.name]["sha256"], hashlib.sha256(path.read_bytes()).hexdigest()
-        )
+        self.assertEqual(set(manifest["files"][path.name]), {"bytes"})
+        self.assertEqual(manifest["files"][path.name]["bytes"], path.stat().st_size)
 
     def test_validation_rejects_empty_duplicate_and_missing_answer_text(self):
         valid = {

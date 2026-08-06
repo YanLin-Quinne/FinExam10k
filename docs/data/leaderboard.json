@@ -1,0 +1,1146 @@
+{
+  "schema_version": 1,
+  "categories": [
+    "Proprietary API served",
+    "Open weight reasoning",
+    "Finance specialized"
+  ],
+  "views": {
+    "full": {
+      "title": "Full Coverage",
+      "description": "All 10,198 curated items across CFA Levels I–III and FRM Parts I–II.",
+      "items": 10198,
+      "chance_accuracy": 31.24,
+      "cfa_items": 7631,
+      "frm_items": 2567,
+      "below_chance_systems": 0,
+      "unanimous_wrong_items": 41,
+      "rows": [
+        {
+          "model": "Gemini-3.1-Pro",
+          "category": "Proprietary API served",
+          "accuracy": 85.29,
+          "adjusted_accuracy": 78.61,
+          "agreement": 88.7,
+          "modal_choice": "B",
+          "modal_share": 33.5,
+          "stages": {
+            "CFA Level I": 90.95,
+            "CFA Level II": 71.74,
+            "CFA Level III": 77.79,
+            "FRM Part I": 90.86,
+            "FRM Part II": 83.93
+          }
+        },
+        {
+          "model": "GPT-5.6-Sol",
+          "category": "Proprietary API served",
+          "accuracy": 84.75,
+          "adjusted_accuracy": 77.83,
+          "agreement": 89.2,
+          "modal_choice": "B",
+          "modal_share": 34.4,
+          "stages": {
+            "CFA Level I": 89.61,
+            "CFA Level II": 71.15,
+            "CFA Level III": 78.1,
+            "FRM Part I": 91.28,
+            "FRM Part II": 85.36
+          }
+        },
+        {
+          "model": "GPT-5.6-Terra",
+          "category": "Proprietary API served",
+          "accuracy": 82.55,
+          "adjusted_accuracy": 74.62,
+          "agreement": 88.5,
+          "modal_choice": "B",
+          "modal_share": 34.4,
+          "stages": {
+            "CFA Level I": 86.73,
+            "CFA Level II": 69.21,
+            "CFA Level III": 75.8,
+            "FRM Part I": 90.38,
+            "FRM Part II": 83.72
+          }
+        },
+        {
+          "model": "DeepSeek-V4-Pro",
+          "category": "Proprietary API served",
+          "accuracy": 82.4,
+          "adjusted_accuracy": 74.4,
+          "agreement": 88.4,
+          "modal_choice": "B",
+          "modal_share": 33.4,
+          "stages": {
+            "CFA Level I": 87.05,
+            "CFA Level II": 69.03,
+            "CFA Level III": 75.65,
+            "FRM Part I": 89.47,
+            "FRM Part II": 82.62
+          }
+        },
+        {
+          "model": "GPT-5.6-Luna",
+          "category": "Proprietary API served",
+          "accuracy": 80.09,
+          "adjusted_accuracy": 71.05,
+          "agreement": 87.9,
+          "modal_choice": "B",
+          "modal_share": 33.8,
+          "stages": {
+            "CFA Level I": 85.53,
+            "CFA Level II": 65.96,
+            "CFA Level III": 72.89,
+            "FRM Part I": 86.74,
+            "FRM Part II": 79.13
+          }
+        },
+        {
+          "model": "Claude-Sonnet-5",
+          "category": "Proprietary API served",
+          "accuracy": 79.82,
+          "adjusted_accuracy": 70.65,
+          "agreement": 86.2,
+          "modal_choice": "B",
+          "modal_share": 33.4,
+          "stages": {
+            "CFA Level I": 84.95,
+            "CFA Level II": 66.05,
+            "CFA Level III": 73.81,
+            "FRM Part I": 86.74,
+            "FRM Part II": 78.25
+          }
+        },
+        {
+          "model": "DeepSeek-R1",
+          "category": "Proprietary API served",
+          "accuracy": 79.75,
+          "adjusted_accuracy": 70.55,
+          "agreement": 88.0,
+          "modal_choice": "B",
+          "modal_share": 34.2,
+          "stages": {
+            "CFA Level I": 84.9,
+            "CFA Level II": 65.55,
+            "CFA Level III": 74.89,
+            "FRM Part I": 86.02,
+            "FRM Part II": 79.45
+          }
+        },
+        {
+          "model": "GPT-OSS-120B",
+          "category": "Open weight reasoning",
+          "accuracy": 75.76,
+          "adjusted_accuracy": 64.75,
+          "agreement": 85.2,
+          "modal_choice": "B",
+          "modal_share": 35.3,
+          "stages": {
+            "CFA Level I": 81.21,
+            "CFA Level II": 61.81,
+            "CFA Level III": 71.36,
+            "FRM Part I": 83.96,
+            "FRM Part II": 69.51
+          }
+        },
+        {
+          "model": "Qwen3.7-Max",
+          "category": "Proprietary API served",
+          "accuracy": 74.74,
+          "adjusted_accuracy": 63.27,
+          "agreement": 82.2,
+          "modal_choice": "B",
+          "modal_share": 35.2,
+          "stages": {
+            "CFA Level I": 80.54,
+            "CFA Level II": 61.58,
+            "CFA Level III": 70.75,
+            "FRM Part I": 78.21,
+            "FRM Part II": 73.01
+          }
+        },
+        {
+          "model": "GPT-5.5",
+          "category": "Proprietary API served",
+          "accuracy": 73.85,
+          "adjusted_accuracy": 61.97,
+          "agreement": 77.9,
+          "modal_choice": "A",
+          "modal_share": 31.6,
+          "stages": {
+            "CFA Level I": 79.0,
+            "CFA Level II": 58.1,
+            "CFA Level III": 66.31,
+            "FRM Part I": 81.9,
+            "FRM Part II": 75.96
+          }
+        },
+        {
+          "model": "GPT-OSS-20B",
+          "category": "Open weight reasoning",
+          "accuracy": 70.06,
+          "adjusted_accuracy": 56.46,
+          "agreement": 78.4,
+          "modal_choice": "B",
+          "modal_share": 33.8,
+          "stages": {
+            "CFA Level I": 75.5,
+            "CFA Level II": 57.52,
+            "CFA Level III": 64.93,
+            "FRM Part I": 77.18,
+            "FRM Part II": 62.95
+          }
+        },
+        {
+          "model": "GPT-4o",
+          "category": "Proprietary API served",
+          "accuracy": 69.15,
+          "adjusted_accuracy": 55.14,
+          "agreement": 78.2,
+          "modal_choice": "B",
+          "modal_share": 35.8,
+          "stages": {
+            "CFA Level I": 75.96,
+            "CFA Level II": 56.75,
+            "CFA Level III": 63.09,
+            "FRM Part I": 70.52,
+            "FRM Part II": 65.57
+          }
+        },
+        {
+          "model": "ODA-Fin-RL-8B",
+          "category": "Finance specialized",
+          "accuracy": 68.07,
+          "adjusted_accuracy": 53.57,
+          "agreement": 76.4,
+          "modal_choice": "B",
+          "modal_share": 32.8,
+          "stages": {
+            "CFA Level I": 75.46,
+            "CFA Level II": 54.49,
+            "CFA Level III": 62.63,
+            "FRM Part I": 72.22,
+            "FRM Part II": 58.91
+          }
+        },
+        {
+          "model": "Fin-O1-14B",
+          "category": "Finance specialized",
+          "accuracy": 65.79,
+          "adjusted_accuracy": 50.25,
+          "agreement": 73.2,
+          "modal_choice": "B",
+          "modal_share": 34.1,
+          "stages": {
+            "CFA Level I": 72.43,
+            "CFA Level II": 53.23,
+            "CFA Level III": 59.11,
+            "FRM Part I": 69.07,
+            "FRM Part II": 60.44
+          }
+        },
+        {
+          "model": "DianJin-R1-32B",
+          "category": "Finance specialized",
+          "accuracy": 64.93,
+          "adjusted_accuracy": 49.01,
+          "agreement": 74.7,
+          "modal_choice": "B",
+          "modal_share": 38.6,
+          "stages": {
+            "CFA Level I": 70.65,
+            "CFA Level II": 52.42,
+            "CFA Level III": 60.49,
+            "FRM Part I": 68.46,
+            "FRM Part II": 62.3
+          }
+        },
+        {
+          "model": "Hawkish-8B",
+          "category": "Finance specialized",
+          "accuracy": 52.25,
+          "adjusted_accuracy": 30.55,
+          "agreement": 60.0,
+          "modal_choice": "B",
+          "modal_share": 40.7,
+          "stages": {
+            "CFA Level I": 57.65,
+            "CFA Level II": 45.33,
+            "CFA Level III": 49.62,
+            "FRM Part I": 51.51,
+            "FRM Part II": 44.04
+          }
+        },
+        {
+          "model": "Fin-R1-7B",
+          "category": "Finance specialized",
+          "accuracy": 51.53,
+          "adjusted_accuracy": 29.51,
+          "agreement": 58.0,
+          "modal_choice": "B",
+          "modal_share": 32.1,
+          "stages": {
+            "CFA Level I": 57.74,
+            "CFA Level II": 40.9,
+            "CFA Level III": 47.47,
+            "FRM Part I": 52.91,
+            "FRM Part II": 45.36
+          }
+        }
+      ]
+    },
+    "cc": {
+      "title": "Context Complete",
+      "description": "The 7,625 items with all answer-relevant evidence present in the local record.",
+      "items": 7625,
+      "chance_accuracy": 30.97,
+      "cfa_items": 5463,
+      "frm_items": 2162,
+      "below_chance_systems": 0,
+      "unanimous_wrong_items": 19,
+      "rows": [
+        {
+          "model": "Gemini-3.1-Pro",
+          "category": "Proprietary API served",
+          "accuracy": 95.96,
+          "adjusted_accuracy": 94.15,
+          "agreement": 94.4,
+          "modal_choice": "B",
+          "modal_share": 31.6,
+          "stages": {
+            "CFA Level I": 98.11,
+            "CFA Level II": 93.94,
+            "CFA Level III": 90.53,
+            "FRM Part I": 95.48,
+            "FRM Part II": 91.02
+          }
+        },
+        {
+          "model": "GPT-5.6-Sol",
+          "category": "Proprietary API served",
+          "accuracy": 95.32,
+          "adjusted_accuracy": 93.22,
+          "agreement": 95.4,
+          "modal_choice": "B",
+          "modal_share": 31.6,
+          "stages": {
+            "CFA Level I": 96.84,
+            "CFA Level II": 93.94,
+            "CFA Level III": 89.61,
+            "FRM Part I": 95.76,
+            "FRM Part II": 91.3
+          }
+        },
+        {
+          "model": "GPT-5.6-Terra",
+          "category": "Proprietary API served",
+          "accuracy": 93.29,
+          "adjusted_accuracy": 90.27,
+          "agreement": 94.6,
+          "modal_choice": "C",
+          "modal_share": 31.7,
+          "stages": {
+            "CFA Level I": 94.51,
+            "CFA Level II": 90.66,
+            "CFA Level III": 86.84,
+            "FRM Part I": 95.69,
+            "FRM Part II": 89.23
+          }
+        },
+        {
+          "model": "DeepSeek-V4-Pro",
+          "category": "Proprietary API served",
+          "accuracy": 93.01,
+          "adjusted_accuracy": 89.87,
+          "agreement": 95.0,
+          "modal_choice": "C",
+          "modal_share": 31.9,
+          "stages": {
+            "CFA Level I": 94.73,
+            "CFA Level II": 91.05,
+            "CFA Level III": 87.07,
+            "FRM Part I": 93.53,
+            "FRM Part II": 88.67
+          }
+        },
+        {
+          "model": "GPT-5.6-Luna",
+          "category": "Proprietary API served",
+          "accuracy": 91.19,
+          "adjusted_accuracy": 87.23,
+          "agreement": 93.9,
+          "modal_choice": "C",
+          "modal_share": 31.8,
+          "stages": {
+            "CFA Level I": 93.27,
+            "CFA Level II": 88.57,
+            "CFA Level III": 84.53,
+            "FRM Part I": 92.14,
+            "FRM Part II": 85.36
+          }
+        },
+        {
+          "model": "DeepSeek-R1",
+          "category": "Proprietary API served",
+          "accuracy": 90.64,
+          "adjusted_accuracy": 86.43,
+          "agreement": 94.2,
+          "modal_choice": "C",
+          "modal_share": 32.1,
+          "stages": {
+            "CFA Level I": 92.54,
+            "CFA Level II": 88.47,
+            "CFA Level III": 84.99,
+            "FRM Part I": 90.96,
+            "FRM Part II": 85.77
+          }
+        },
+        {
+          "model": "Claude-Sonnet-5",
+          "category": "Proprietary API served",
+          "accuracy": 90.24,
+          "adjusted_accuracy": 85.86,
+          "agreement": 92.2,
+          "modal_choice": "B",
+          "modal_share": 31.1,
+          "stages": {
+            "CFA Level I": 91.97,
+            "CFA Level II": 86.58,
+            "CFA Level III": 85.68,
+            "FRM Part I": 91.79,
+            "FRM Part II": 85.36
+          }
+        },
+        {
+          "model": "GPT-5.5",
+          "category": "Proprietary API served",
+          "accuracy": 86.02,
+          "adjusted_accuracy": 79.75,
+          "agreement": 88.6,
+          "modal_choice": "B",
+          "modal_share": 31.4,
+          "stages": {
+            "CFA Level I": 88.3,
+            "CFA Level II": 81.21,
+            "CFA Level III": 78.29,
+            "FRM Part I": 86.93,
+            "FRM Part II": 82.87
+          }
+        },
+        {
+          "model": "GPT-OSS-120B",
+          "category": "Open weight reasoning",
+          "accuracy": 85.88,
+          "adjusted_accuracy": 79.54,
+          "agreement": 90.6,
+          "modal_choice": "C",
+          "modal_share": 32.0,
+          "stages": {
+            "CFA Level I": 88.37,
+            "CFA Level II": 81.71,
+            "CFA Level III": 81.99,
+            "FRM Part I": 88.32,
+            "FRM Part II": 75.28
+          }
+        },
+        {
+          "model": "Qwen3.7-Max",
+          "category": "Proprietary API served",
+          "accuracy": 84.77,
+          "adjusted_accuracy": 77.94,
+          "agreement": 87.9,
+          "modal_choice": "C",
+          "modal_share": 32.1,
+          "stages": {
+            "CFA Level I": 87.8,
+            "CFA Level II": 81.31,
+            "CFA Level III": 80.14,
+            "FRM Part I": 83.1,
+            "FRM Part II": 78.87
+          }
+        },
+        {
+          "model": "GPT-OSS-20B",
+          "category": "Open weight reasoning",
+          "accuracy": 79.4,
+          "adjusted_accuracy": 70.15,
+          "agreement": 83.5,
+          "modal_choice": "C",
+          "modal_share": 31.4,
+          "stages": {
+            "CFA Level I": 82.08,
+            "CFA Level II": 75.05,
+            "CFA Level III": 74.13,
+            "FRM Part I": 81.78,
+            "FRM Part II": 68.92
+          }
+        },
+        {
+          "model": "GPT-4o",
+          "category": "Proprietary API served",
+          "accuracy": 78.26,
+          "adjusted_accuracy": 68.5,
+          "agreement": 81.9,
+          "modal_choice": "C",
+          "modal_share": 34.1,
+          "stages": {
+            "CFA Level I": 82.68,
+            "CFA Level II": 73.66,
+            "CFA Level III": 71.59,
+            "FRM Part I": 74.83,
+            "FRM Part II": 70.86
+          }
+        },
+        {
+          "model": "ODA-Fin-RL-8B",
+          "category": "Finance specialized",
+          "accuracy": 77.64,
+          "adjusted_accuracy": 67.61,
+          "agreement": 81.5,
+          "modal_choice": "C",
+          "modal_share": 31.2,
+          "stages": {
+            "CFA Level I": 82.65,
+            "CFA Level II": 71.37,
+            "CFA Level III": 69.05,
+            "FRM Part I": 76.84,
+            "FRM Part II": 65.19
+          }
+        },
+        {
+          "model": "Fin-O1-14B",
+          "category": "Finance specialized",
+          "accuracy": 74.5,
+          "adjusted_accuracy": 63.07,
+          "agreement": 78.2,
+          "modal_choice": "C",
+          "modal_share": 34.6,
+          "stages": {
+            "CFA Level I": 78.75,
+            "CFA Level II": 68.99,
+            "CFA Level III": 65.36,
+            "FRM Part I": 74.13,
+            "FRM Part II": 64.78
+          }
+        },
+        {
+          "model": "DianJin-R1-32B",
+          "category": "Finance specialized",
+          "accuracy": 72.85,
+          "adjusted_accuracy": 60.67,
+          "agreement": 76.9,
+          "modal_choice": "B",
+          "modal_share": 33.5,
+          "stages": {
+            "CFA Level I": 76.42,
+            "CFA Level II": 67.0,
+            "CFA Level III": 66.28,
+            "FRM Part I": 71.84,
+            "FRM Part II": 67.13
+          }
+        },
+        {
+          "model": "Fin-R1-7B",
+          "category": "Finance specialized",
+          "accuracy": 58.95,
+          "adjusted_accuracy": 40.53,
+          "agreement": 62.2,
+          "modal_choice": "B",
+          "modal_share": 31.3,
+          "stages": {
+            "CFA Level I": 62.97,
+            "CFA Level II": 54.27,
+            "CFA Level III": 56.12,
+            "FRM Part I": 56.05,
+            "FRM Part II": 50.55
+          }
+        },
+        {
+          "model": "Hawkish-8B",
+          "category": "Finance specialized",
+          "accuracy": 56.49,
+          "adjusted_accuracy": 36.96,
+          "agreement": 59.3,
+          "modal_choice": "B",
+          "modal_share": 35.3,
+          "stages": {
+            "CFA Level I": 60.83,
+            "CFA Level II": 52.19,
+            "CFA Level III": 53.81,
+            "FRM Part I": 53.41,
+            "FRM Part II": 45.99
+          }
+        }
+      ]
+    },
+    "h372": {
+      "title": "Context Complete Hard",
+      "description": "The 372 context-complete items in the frozen Hard band.",
+      "items": 372,
+      "chance_accuracy": 30.4,
+      "cfa_items": 241,
+      "frm_items": 131,
+      "below_chance_systems": 14,
+      "unanimous_wrong_items": 19,
+      "rows": [
+        {
+          "model": "Gemini-3.1-Pro",
+          "category": "Proprietary API served",
+          "accuracy": 54.57,
+          "adjusted_accuracy": 34.73,
+          "agreement": 41.9,
+          "modal_choice": "A",
+          "modal_share": 35.5,
+          "stages": {
+            "CFA Level I": 75.0,
+            "CFA Level II": 47.46,
+            "CFA Level III": 36.96,
+            "FRM Part I": 43.08,
+            "FRM Part II": 42.42
+          }
+        },
+        {
+          "model": "GPT-5.6-Sol",
+          "category": "Proprietary API served",
+          "accuracy": 39.52,
+          "adjusted_accuracy": 13.1,
+          "agreement": 57.0,
+          "modal_choice": "A",
+          "modal_share": 32.3,
+          "stages": {
+            "CFA Level I": 52.21,
+            "CFA Level II": 38.98,
+            "CFA Level III": 23.91,
+            "FRM Part I": 33.85,
+            "FRM Part II": 30.3
+          }
+        },
+        {
+          "model": "GPT-5.6-Terra",
+          "category": "Proprietary API served",
+          "accuracy": 31.18,
+          "adjusted_accuracy": 1.13,
+          "agreement": 62.6,
+          "modal_choice": "C",
+          "modal_share": 30.9,
+          "stages": {
+            "CFA Level I": 33.82,
+            "CFA Level II": 28.81,
+            "CFA Level III": 15.22,
+            "FRM Part I": 36.92,
+            "FRM Part II": 33.33
+          }
+        },
+        {
+          "model": "DeepSeek-V4-Pro",
+          "category": "Proprietary API served",
+          "accuracy": 26.08,
+          "adjusted_accuracy": -6.21,
+          "agreement": 66.4,
+          "modal_choice": "C",
+          "modal_share": 33.6,
+          "stages": {
+            "CFA Level I": 28.68,
+            "CFA Level II": 23.73,
+            "CFA Level III": 21.74,
+            "FRM Part I": 20.0,
+            "FRM Part II": 31.82
+          }
+        },
+        {
+          "model": "Claude-Sonnet-5",
+          "category": "Proprietary API served",
+          "accuracy": 21.24,
+          "adjusted_accuracy": -13.16,
+          "agreement": 68.0,
+          "modal_choice": "A",
+          "modal_share": 30.9,
+          "stages": {
+            "CFA Level I": 19.85,
+            "CFA Level II": 18.64,
+            "CFA Level III": 17.39,
+            "FRM Part I": 26.15,
+            "FRM Part II": 24.24
+          }
+        },
+        {
+          "model": "GPT-5.5",
+          "category": "Proprietary API served",
+          "accuracy": 21.24,
+          "adjusted_accuracy": -13.16,
+          "agreement": 68.3,
+          "modal_choice": "C",
+          "modal_share": 31.5,
+          "stages": {
+            "CFA Level I": 22.79,
+            "CFA Level II": 20.34,
+            "CFA Level III": 17.39,
+            "FRM Part I": 26.15,
+            "FRM Part II": 16.67
+          }
+        },
+        {
+          "model": "GPT-5.6-Luna",
+          "category": "Proprietary API served",
+          "accuracy": 18.01,
+          "adjusted_accuracy": -17.8,
+          "agreement": 74.2,
+          "modal_choice": "C",
+          "modal_share": 31.5,
+          "stages": {
+            "CFA Level I": 18.38,
+            "CFA Level II": 18.64,
+            "CFA Level III": 10.87,
+            "FRM Part I": 24.62,
+            "FRM Part II": 15.15
+          }
+        },
+        {
+          "model": "Qwen3.7-Max",
+          "category": "Proprietary API served",
+          "accuracy": 14.78,
+          "adjusted_accuracy": -22.43,
+          "agreement": 74.7,
+          "modal_choice": "C",
+          "modal_share": 34.7,
+          "stages": {
+            "CFA Level I": 17.65,
+            "CFA Level II": 20.34,
+            "CFA Level III": 8.7,
+            "FRM Part I": 10.77,
+            "FRM Part II": 12.12
+          }
+        },
+        {
+          "model": "DeepSeek-R1",
+          "category": "Proprietary API served",
+          "accuracy": 14.25,
+          "adjusted_accuracy": -23.21,
+          "agreement": 78.8,
+          "modal_choice": "C",
+          "modal_share": 35.2,
+          "stages": {
+            "CFA Level I": 11.76,
+            "CFA Level II": 16.95,
+            "CFA Level III": 15.22,
+            "FRM Part I": 13.85,
+            "FRM Part II": 16.67
+          }
+        },
+        {
+          "model": "GPT-4o",
+          "category": "Proprietary API served",
+          "accuracy": 12.9,
+          "adjusted_accuracy": -25.14,
+          "agreement": 73.9,
+          "modal_choice": "C",
+          "modal_share": 41.7,
+          "stages": {
+            "CFA Level I": 15.44,
+            "CFA Level II": 16.95,
+            "CFA Level III": 13.04,
+            "FRM Part I": 6.15,
+            "FRM Part II": 10.61
+          }
+        },
+        {
+          "model": "Hawkish-8B",
+          "category": "Finance specialized",
+          "accuracy": 12.37,
+          "adjusted_accuracy": -25.91,
+          "agreement": 64.0,
+          "modal_choice": "C",
+          "modal_share": 40.9,
+          "stages": {
+            "CFA Level I": 13.97,
+            "CFA Level II": 11.86,
+            "CFA Level III": 13.04,
+            "FRM Part I": 12.31,
+            "FRM Part II": 9.09
+          }
+        },
+        {
+          "model": "Fin-O1-14B",
+          "category": "Finance specialized",
+          "accuracy": 12.1,
+          "adjusted_accuracy": -26.3,
+          "agreement": 71.5,
+          "modal_choice": "C",
+          "modal_share": 38.2,
+          "stages": {
+            "CFA Level I": 10.29,
+            "CFA Level II": 20.34,
+            "CFA Level III": 8.7,
+            "FRM Part I": 13.85,
+            "FRM Part II": 9.09
+          }
+        },
+        {
+          "model": "Fin-R1-7B",
+          "category": "Finance specialized",
+          "accuracy": 9.95,
+          "adjusted_accuracy": -29.39,
+          "agreement": 67.2,
+          "modal_choice": "C",
+          "modal_share": 34.7,
+          "stages": {
+            "CFA Level I": 11.76,
+            "CFA Level II": 6.78,
+            "CFA Level III": 10.87,
+            "FRM Part I": 7.69,
+            "FRM Part II": 10.61
+          }
+        },
+        {
+          "model": "GPT-OSS-20B",
+          "category": "Open weight reasoning",
+          "accuracy": 7.8,
+          "adjusted_accuracy": -32.48,
+          "agreement": 73.9,
+          "modal_choice": "C",
+          "modal_share": 34.1,
+          "stages": {
+            "CFA Level I": 2.94,
+            "CFA Level II": 11.86,
+            "CFA Level III": 10.87,
+            "FRM Part I": 10.77,
+            "FRM Part II": 9.09
+          }
+        },
+        {
+          "model": "ODA-Fin-RL-8B",
+          "category": "Finance specialized",
+          "accuracy": 6.99,
+          "adjusted_accuracy": -33.63,
+          "agreement": 71.5,
+          "modal_choice": "C",
+          "modal_share": 33.1,
+          "stages": {
+            "CFA Level I": 6.62,
+            "CFA Level II": 5.08,
+            "CFA Level III": 10.87,
+            "FRM Part I": 6.15,
+            "FRM Part II": 7.58
+          }
+        },
+        {
+          "model": "DianJin-R1-32B",
+          "category": "Finance specialized",
+          "accuracy": 5.91,
+          "adjusted_accuracy": -35.18,
+          "agreement": 73.9,
+          "modal_choice": "B",
+          "modal_share": 32.0,
+          "stages": {
+            "CFA Level I": 8.82,
+            "CFA Level II": 6.78,
+            "CFA Level III": 8.7,
+            "FRM Part I": 3.08,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "GPT-OSS-120B",
+          "category": "Open weight reasoning",
+          "accuracy": 5.65,
+          "adjusted_accuracy": -35.56,
+          "agreement": 82.3,
+          "modal_choice": "C",
+          "modal_share": 33.9,
+          "stages": {
+            "CFA Level I": 3.68,
+            "CFA Level II": 8.47,
+            "CFA Level III": 6.52,
+            "FRM Part I": 6.15,
+            "FRM Part II": 6.06
+          }
+        }
+      ]
+    },
+    "z188": {
+      "title": "Universal Failure Core",
+      "description": "The 188 items missed by every system in the frozen panel.",
+      "items": 188,
+      "chance_accuracy": 31.52,
+      "cfa_items": 147,
+      "frm_items": 41,
+      "below_chance_systems": 17,
+      "unanimous_wrong_items": 41,
+      "rows": [
+        {
+          "model": "DeepSeek-V4-Pro",
+          "category": "Proprietary API served",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 82.4,
+          "modal_choice": "B",
+          "modal_share": 35.1,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "Gemini-3.1-Pro",
+          "category": "Proprietary API served",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 86.7,
+          "modal_choice": "B",
+          "modal_share": 38.3,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "Claude-Sonnet-5",
+          "category": "Proprietary API served",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 82.4,
+          "modal_choice": "B",
+          "modal_share": 38.8,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "DeepSeek-R1",
+          "category": "Proprietary API served",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 86.7,
+          "modal_choice": "B",
+          "modal_share": 37.8,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "GPT-OSS-120B",
+          "category": "Open weight reasoning",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 86.7,
+          "modal_choice": "B",
+          "modal_share": 41.0,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "Qwen3.7-Max",
+          "category": "Proprietary API served",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 84.0,
+          "modal_choice": "B",
+          "modal_share": 42.0,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "GPT-5.5",
+          "category": "Proprietary API served",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 70.2,
+          "modal_choice": "A",
+          "modal_share": 28.7,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "GPT-OSS-20B",
+          "category": "Open weight reasoning",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 78.7,
+          "modal_choice": "B",
+          "modal_share": 36.7,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "GPT-4o",
+          "category": "Proprietary API served",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 86.7,
+          "modal_choice": "B",
+          "modal_share": 40.4,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "ODA-Fin-RL-8B",
+          "category": "Finance specialized",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 75.0,
+          "modal_choice": "B",
+          "modal_share": 39.4,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "Fin-O1-14B",
+          "category": "Finance specialized",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 78.2,
+          "modal_choice": "B",
+          "modal_share": 36.2,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "DianJin-R1-32B",
+          "category": "Finance specialized",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 82.4,
+          "modal_choice": "B",
+          "modal_share": 45.7,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "Hawkish-8B",
+          "category": "Finance specialized",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 73.4,
+          "modal_choice": "B",
+          "modal_share": 42.6,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "Fin-R1-7B",
+          "category": "Finance specialized",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 64.9,
+          "modal_choice": "B",
+          "modal_share": 34.0,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "GPT-5.6-Sol",
+          "category": "Proprietary API served",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 86.7,
+          "modal_choice": "B",
+          "modal_share": 38.8,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "GPT-5.6-Terra",
+          "category": "Proprietary API served",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 83.0,
+          "modal_choice": "B",
+          "modal_share": 41.5,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        },
+        {
+          "model": "GPT-5.6-Luna",
+          "category": "Proprietary API served",
+          "accuracy": 0.0,
+          "adjusted_accuracy": -46.02,
+          "agreement": 82.4,
+          "modal_choice": "B",
+          "modal_share": 37.2,
+          "stages": {
+            "CFA Level I": 0.0,
+            "CFA Level II": 0.0,
+            "CFA Level III": 0.0,
+            "FRM Part I": 0.0,
+            "FRM Part II": 0.0
+          }
+        }
+      ]
+    }
+  }
+}

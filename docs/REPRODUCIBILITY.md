@@ -1,23 +1,18 @@
-# Reproducibility contract
+# Reproducibility
 
-All commands below run from the repository root on Python 3.11. The public artifact contains the
-required per-item inputs, frozen Gate coefficients, selector state, and prediction matrices. No
-GPU or network access is required.
+All commands run from the package root with Python 3.11 or 3.12. Public reproduction uses released
+records, frozen predictions, frozen Gate coefficients, selector state, and aggregate result files.
+It does not rerun model inference or reconstruct the held-out partition.
 
-## One-command public reproduction
+## Complete public reproduction
 
 ```bash
 python code/public_reproduce.py
 ```
 
-CI executes this exact command through `run_tests.sh`. It runs public diagnostics, public RQ1 and
-RQ2 checks, the frozen public Gate training audit, the real Gate inference CLI, and the frozen
-selector audit. The Gate CLI must verify 373 public triggers and the decision-vector hash in
-`data/router/public_decision_manifest.json`.
-
-The paper's held-out Gate result is separate: 404 triggers over 5,088 sequestered items, with 55
-rescues and 35 harms. Public reproduction verifies that the frozen held-out manifest is present
-and internally bounded, but cannot and must not regenerate sequestered per-item decisions.
+This runs public difficulty diagnostics, RQ1 and RQ2 comparisons, the five-fold Gate training check,
+public Gate inference, and selector checks. The Gate check preserves feature order, 27-dimensional
+inputs, the frozen threshold, 373 public triggers, and the published public routed outcome.
 
 ## Public exports
 
@@ -25,30 +20,21 @@ and internally bounded, but cannot and must not regenerate sequestered per-item 
 python code/data/build_public_exports.py --out /tmp/finexam10k_public_exports
 ```
 
-The output directory contains canonical JSON, JSONL, CSV, summary CSVs, and a freshly built XLSX.
-The XLSX is constructed from the released JSON rather than copied from a workbook. Its six sheets,
-five summary tables, and intervention chart contain the same public records and summaries. The
-builder clears creator and last-modifier properties, removes absolute-path extensions, fixes ZIP
-metadata, and rejects remaining local paths or spreadsheet formula errors.
+The command rebuilds equivalent JSON, JSONL, CSV, and XLSX representations for 5,110 public records.
+The workbook is constructed from the released JSON and contains the same public fields and summary
+tables.
 
-No exporter uses the gold answer to invent missing question, option, vignette, table, figure, or
-exhibit content. Records with detached context retain their published completeness flags.
-
-## Anonymous review bundle
+## Full package tests
 
 ```bash
-python code/release/update_manifest.py
-python code/release/build_anonymous_bundle.py --out /tmp/FinExam10k-anonymous.zip
+./run_tests.sh
 ```
 
-Regenerate the manifest only after rebuilding the checked-in public exports. The anonymous ZIP is
-deterministic for a fixed checkout, has an empty comment, contains no Git directory or GitHub
-workflow metadata, and is scanned for identity strings, local paths, public repository URLs,
-badges, commit hashes, unsafe archive names, OOXML leaks, and operating-system ZIP metadata.
+The suite checks row counts, required fields, unique IDs, format equivalence, public/held-out
+separation, model and result matrix alignment, frozen feature dimensions, aggregate arithmetic,
+published Gate and selector results, and the static leaderboard contract.
 
 ## Compute boundary
 
-The paper reports `1 + trigger rate` as an implied branch-invocation count under lazy execution.
-It is not measured latency, token use, monetary cost, energy, or a rerun of the H100 model panel.
-The public reproduction consumes frozen predictions and does not silently rerun full model
-inference, change the held-out result, or re-band empirical difficulty.
+The reported implied branch-call count is `1 + trigger rate` under lazy execution. It is not measured
+latency, token use, monetary cost, energy use, or a rerun of the model panel.

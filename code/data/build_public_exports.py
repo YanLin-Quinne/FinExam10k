@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import hashlib
 import json
 from pathlib import Path
 import sys
@@ -202,9 +201,6 @@ def intervention_scores(rows: list[dict]) -> list[dict]:
         })
     return out
 
-def sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path, default=DATA / "public")
@@ -261,7 +257,7 @@ Files:
 - `stage_summary.csv`, `difficulty_context_summary.csv`: count summaries.
 - `model_public_scores.csv`: public 17-model scores recomputed from the released response matrix.
 - `intervention_public_scores.csv`: public intervention-arm scores and rescue/harm counts.
-- `public_export_manifest.json`: row counts and SHA-256 checksums for the export files.
+- `public_export_manifest.json`: row counts and file sizes for the export files.
 
 Scope:
 
@@ -281,7 +277,7 @@ Context completeness is a local-answerability flag, not a structural schema flag
     }
     for path in sorted(out.iterdir()):
         if path.is_file() and path.name != "public_export_manifest.json":
-            manifest["files"][path.name] = {"sha256": sha256(path), "bytes": path.stat().st_size}
+            manifest["files"][path.name] = {"bytes": path.stat().st_size}
     write_json(out / "public_export_manifest.json", manifest)
     print(f"wrote {len(rows)} public records to {out}")
     return 0

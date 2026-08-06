@@ -12,7 +12,7 @@ Files:
 - `stage_summary.csv`, `difficulty_context_summary.csv`: count summaries.
 - `model_public_scores.csv`: public 17-model scores recomputed from the released response matrix.
 - `intervention_public_scores.csv`: public intervention-arm scores and rescue/harm counts.
-- `public_export_manifest.json`: row counts and SHA-256 checksums for the export files.
+- `public_export_manifest.json`: row counts and file sizes for the export files.
 
 Scope:
 

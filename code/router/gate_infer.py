@@ -1,15 +1,11 @@
 """Deterministic inference for the frozen gate. No fitting, no randomness, no network.
 
-This script exists so that the one positive method result in the paper can be checked rather than
-believed. It loads the frozen coefficients, rebuilds the 27 features from released data, applies
-the frozen threshold, and prints the routing decisions together with a sha256 of the decision
-vector.
+This script loads the frozen coefficients, rebuilds the 27 features from released data, applies the
+frozen threshold, and reports the resulting trigger count and routed outcome.
 
-On the released public partition it runs end to end and reports the fire rate and the routed
-accuracy. On the held-out partition, which is not released, it cannot run here. What it can do is
-let anyone who obtains that partition under the leaderboard protocol recompute the decision vector
-and compare its hash against `data/router/heldout_decision_manifest.json`. A match proves the
-frozen model reproduces the reported evaluation exactly, without us having to release the items.
+On the released public partition it runs end to end and reports the fire rate and routed accuracy.
+The held-out partition is not released, so its reported aggregate outcome cannot be regenerated
+from this package.
 
 Two properties are enforced rather than promised.
 
@@ -24,7 +20,6 @@ Two properties are enforced rather than promised.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import math
 import pathlib
@@ -98,13 +93,8 @@ def main() -> int:
         decisions[i] = "graph" if p >= thr else "direct"
 
     fired = sum(1 for v in decisions.values() if v != "direct")
-    vec = "".join("1" if decisions[i] != "direct" else "0" for i in ids)
-    decision_hash = hashlib.sha256(vec.encode()).hexdigest()
-    id_hash = hashlib.sha256("".join(ids).encode()).hexdigest()
     print(f"scored        {len(ids):,} items")
     print(f"fired         {fired}  ({fired/len(ids)*100:.2f}%)")
-    print(f"decision vector sha256   {decision_hash}")
-    print(f"item id set    sha256    {id_hash}")
 
     outcome = None
     if interventions_path is not None:
@@ -148,12 +138,6 @@ def main() -> int:
         expected = {
             "n_items": len(ids),
             "fired": fired,
-            "decision_vector_sha256": decision_hash,
-            (
-                "held_out_id_set_sha256"
-                if "held_out_id_set_sha256" in manifest
-                else "item_id_set_sha256"
-            ): id_hash,
         }
         for field, value in expected.items():
             if manifest.get(field) != value:

@@ -68,7 +68,5 @@
   "scaler_note": "No feature scaling is applied. All 27 features are either binary indicators or already divided by a fixed constant in the feature function, so the coefficients act on raw values. A reimplementation must not standardise.",
   "decision_rule": "p = sigmoid(intercept + coef . x) over feature_names in the order given. Route to the FunctionGraph-RAG condition when p >= threshold, otherwise stay with Direct.",
   "feature_count": 27,
-  "original_training_public_id_sha256": "f6ca298787ad97524932dbb6cfcef3feade5d943619c3d2176c885d1ddec36b2",
-  "released_public_id_set_sha256": "4a9320477de36093232b9f9f33e5b344a1f964a894f318d90e2d24b67f39f0c5",
   "identifier_note": "Release identifiers were re-minted after the experiment. The shipped public_cv_folds.json preserves the original five-fold assignment on opaque release identifiers."
 }
