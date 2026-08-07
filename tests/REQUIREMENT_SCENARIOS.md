@@ -31,3 +31,10 @@ selector, RQ1, and RQ2 results using frozen inputs without file-summary machiner
 Tracked release metadata contains no file-content summaries or source version tokens. Dataset
 structure, split boundaries, matrix alignment, feature dimensions, and
 published result assertions remain covered.
+
+## G. GitHub Pages deployment
+
+The assembled site serves the same leaderboard at the repository Pages root and at
+`leaderboard.html`. Stylesheets, scripts, aggregate JSON, visual assets, and all four public data
+downloads resolve within the deployed project subpath. Only the 5,110-record public exports and
+aggregate leaderboard data are staged; no held-out item files are published.
