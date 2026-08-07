@@ -105,6 +105,14 @@ class ReadmePresentationTests(unittest.TestCase):
             self.assertIn(relative, README)
             self.assertTrue((ROOT / relative).is_file(), relative)
 
+        figure_block = (
+            "## Figure 1\n\n"
+            "![Figure 1. FinExam-10K corpus, empirical difficulty construction, and observed "
+            "failure patterns.](docs/assets/figure-1-overview.png)"
+        )
+        self.assertEqual(README.count(figure_block), 1)
+        self.assertIn(f"{figure_block}\n\n## Citation", README)
+
     def test_readme_uses_paper_method_names(self):
         for label in (
             "Direct",

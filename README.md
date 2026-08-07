@@ -10,10 +10,6 @@ reproduction code, Figure 1, tests, and an offline leaderboard.
 
 [![FinExam-10K leaderboard preview](docs/assets/leaderboard-preview.png)](docs/index.html)
 
-## Figure 1
-
-![Figure 1. FinExam-10K corpus, empirical difficulty construction, and observed failure patterns.](docs/assets/figure-1-overview.png)
-
 ## Results at a Glance
 
 The Full-Coverage Track evaluates all 10,198 items. The 17-model leaderboard ranges from 51.53% to
@@ -265,6 +261,10 @@ for autonomous investment, risk management, compliance, or advisory use.
 Code under `code/` is released under the MIT License. The public dataset is provided for
 noncommercial research use under the terms in [LICENSE.md](LICENSE.md). Official CFA Institute and
 GARP examination content is excluded. CFA Institute and GARP do not endorse this work.
+
+## Figure 1
+
+![Figure 1. FinExam-10K corpus, empirical difficulty construction, and observed failure patterns.](docs/assets/figure-1-overview.png)
 
 ## Citation
 

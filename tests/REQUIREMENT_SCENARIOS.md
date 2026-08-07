@@ -3,8 +3,9 @@
 ## A. Public project presentation
 
 The README uses the paper title without reviewer packaging language. It remains identity-free,
-references the existing Figure 1 and leaderboard preview, links to the offline leaderboard, and
-provides valid relative links to the public exports and diagnostic files.
+places the existing Figure 1 exactly once immediately before Citation, retains the leaderboard
+preview, links to the offline leaderboard, and provides valid relative links to the public exports
+and diagnostic files.
 
 ## B. Leaderboard behavior
 
