@@ -1,6 +1,6 @@
 # Public FinExam-10K data exports
 
-This directory contains reviewer-facing exports of the 5,110 public mock/practice records.
+This directory contains public exports of the 5,110 Mock and Practice Exam records.
 
 Files:
 

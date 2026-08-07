@@ -1,9 +1,10 @@
 # Requirement scenarios
 
-## A. Anonymous package presentation
+## A. Public project presentation
 
-The README references an existing Figure 1 asset and leaderboard preview, links to the expected
-offline leaderboard, and provides relative links to JSON, JSONL, CSV, and XLSX public exports.
+The README uses the paper title without reviewer packaging language. It remains identity-free,
+references the existing Figure 1 and leaderboard preview, links to the offline leaderboard, and
+provides valid relative links to the public exports and diagnostic files.
 
 ## B. Leaderboard behavior
 
@@ -26,7 +27,7 @@ the same IDs and values, and the export summary contains counts and file sizes o
 The public reproduction entry point and aggregate arithmetic reproduce the published public Gate,
 selector, RQ1, and RQ2 results using frozen inputs without file-summary machinery.
 
-## F. Anonymous package scope
+## F. Release metadata scope
 
 Tracked release metadata contains no file-content summaries or source version tokens. Dataset
 structure, split boundaries, matrix alignment, feature dimensions, and
@@ -38,3 +39,10 @@ The assembled site serves the same leaderboard at the repository Pages root and 
 `leaderboard.html`. Stylesheets, scripts, aggregate JSON, visual assets, and all four public data
 downloads resolve within the deployed project subpath. Only the 5,110-record public exports and
 aggregate leaderboard data are staged; no held-out item files are published.
+
+## H. README scientific content
+
+The README records the full, public, and held-out counts, the frozen difficulty bands, the
+Context-Complete Reasoning Track, and the two nested diagnostics. It distinguishes structural
+record completeness from detached parent evidence, lists all 17 leaderboard models, and describes
+the matched Function-RAG, FunctionGraph-RAG, verification, and frozen public gate conditions.

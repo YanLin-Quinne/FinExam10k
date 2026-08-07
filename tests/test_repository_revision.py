@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 import unittest
+from urllib.parse import unquote, urlsplit
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,7 +12,74 @@ README = (ROOT / "README.md").read_text(encoding="utf-8")
 SITE = ROOT / "docs"
 
 
-class AnonymousPackagePresentationTests(unittest.TestCase):
+class ReadmePresentationTests(unittest.TestCase):
+    def test_title_anonymity_and_length(self):
+        lines = README.splitlines()
+        self.assertEqual(
+            lines[0],
+            "# FinExam-10K: When Retrieval Helps Financial Reasoning?",
+        )
+        self.assertGreaterEqual(len(lines), 180)
+        self.assertLessEqual(len(lines), 280)
+
+        lowered = README.lower()
+        for forbidden in (
+            "anonymous reviewer artifact",
+            "reviewer artifact",
+            "security audit artifact",
+            "yanlin",
+            "quinne",
+            "github.com",
+            "github.io",
+            "/users/",
+            "sha256",
+        ):
+            self.assertNotIn(forbidden, lowered)
+        self.assertIsNone(
+            re.search(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", README)
+        )
+
+    def test_all_relative_readme_links_exist(self):
+        targets = re.findall(r"!?\[[^\]]*\]\(([^)]+)\)", README)
+        self.assertGreater(len(targets), 10)
+        for target in targets:
+            parsed = urlsplit(target)
+            self.assertFalse(parsed.scheme, target)
+            self.assertFalse(parsed.netloc, target)
+            relative = unquote(parsed.path)
+            if not relative:
+                continue
+            resolved = (ROOT / relative).resolve()
+            self.assertTrue(resolved.is_relative_to(ROOT.resolve()), target)
+            self.assertTrue(resolved.is_file(), target)
+
+    def test_dataset_counts_tracks_and_diagnostics(self):
+        for token in (
+            "10,198",
+            "5,110",
+            "5,088",
+            "6,578",
+            "2,183",
+            "1,437",
+            "7,625",
+            "372",
+            "188",
+            "Mock and Practice Exam",
+            "does not mean malformed JSON",
+            "No held-out question text",
+        ):
+            self.assertIn(token, README)
+
+    def test_results_list_all_seventeen_models(self):
+        leaderboard = json.loads(
+            (ROOT / "docs/data/leaderboard.json").read_text(encoding="utf-8")
+        )
+        rows = leaderboard["views"]["full"]["rows"]
+        self.assertEqual(len(rows), 17)
+        for row in rows:
+            self.assertIn(row["model"], README)
+            self.assertIn(f'{row["accuracy"]:.2f}', README)
+
     def test_readme_assets_and_public_links_exist(self):
         expected_assets = (
             "docs/assets/figure-1-overview.png",
@@ -28,6 +97,10 @@ class AnonymousPackagePresentationTests(unittest.TestCase):
             "data/public/finexam10k_public_5110_canonical.jsonl",
             "data/public/finexam10k_public_5110_table.csv",
             "data/public/finexam10k_public_5110.xlsx",
+            "data/context_completeness_public.json",
+            "data/difficulty_labels_public_5110.json",
+            "data/diagnostic_context_complete_hard.json",
+            "data/diagnostic_zero_solve.json",
         ):
             self.assertIn(relative, README)
             self.assertTrue((ROOT / relative).is_file(), relative)
@@ -109,7 +182,7 @@ class LeaderboardSiteTests(unittest.TestCase):
         self.assertIn("prefers-reduced-motion", self.css)
 
 
-class AnonymousPackageScopeTests(unittest.TestCase):
+class ReleaseMetadataScopeTests(unittest.TestCase):
     def test_release_metadata_has_no_file_summary_fields(self):
         source_version = "source_" + "commit"
         model_version = "revi" + "sion"
