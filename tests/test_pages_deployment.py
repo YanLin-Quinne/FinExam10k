@@ -67,16 +67,23 @@ class PagesDeploymentTests(unittest.TestCase):
         ):
             self.assertTrue((self.site / asset).is_file(), asset)
 
-    def test_all_four_public_downloads_resolve_without_parent_links(self) -> None:
-        expected = (
+    def test_public_downloads_and_documentation_resolve_without_parent_links(self) -> None:
+        linked = (
+            "data/public/finexam10k_public_5110_canonical.json",
+            "data/public/finexam10k_public_5110.xlsx",
+        )
+        packaged = (
             "data/public/finexam10k_public_5110_canonical.json",
             "data/public/finexam10k_public_5110_canonical.jsonl",
             "data/public/finexam10k_public_5110_table.csv",
             "data/public/finexam10k_public_5110.xlsx",
         )
         self.assertNotIn('href="../', self.index)
-        for relative in expected:
+        for relative in linked:
             self.assertIn(f'href="{relative}"', self.index)
+        self.assertIn('href="REPRODUCIBILITY.md"', self.index)
+        self.assertTrue((self.site / "REPRODUCIBILITY.md").is_file())
+        for relative in packaged:
             published = self.site / relative
             source = PUBLIC_DATA / Path(relative).name
             self.assertTrue(filecmp.cmp(source, published, shallow=False), relative)
