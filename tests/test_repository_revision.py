@@ -83,7 +83,7 @@ class ReadmePresentationTests(unittest.TestCase):
     def test_readme_assets_and_public_links_exist(self):
         expected_assets = (
             "docs/assets/figure-1-overview.png",
-            "docs/assets/leaderboard-preview.png",
+            "docs/assets/leaderboard-preview-v2.png",
         )
         for relative in expected_assets:
             self.assertIn(relative, README)
@@ -257,7 +257,7 @@ class LeaderboardSiteTests(unittest.TestCase):
         )
 
     def test_preview_is_anonymous_png(self):
-        payload = (SITE / "assets/leaderboard-preview.png").read_bytes()
+        payload = (SITE / "assets/leaderboard-preview-v2.png").read_bytes()
         self.assertEqual(payload[:8], b"\x89PNG\r\n\x1a\n")
         position = 8
         chunk_types = []

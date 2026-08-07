@@ -6,9 +6,9 @@ III and FRM Parts I and II. It contains 10,198 expert-reannotated multiple-choic
 releases the 5,110-item public partition, aggregate held-out results, frozen selectors, public
 reproduction code, Figure 1, tests, and an offline leaderboard.
 
-[Open the offline leaderboard](https://yanlin-quinne.github.io/FinExam10k/leaderboard.html)
+[Open the offline leaderboard](docs/index.html)
 
-[![FinExam-10K leaderboard preview](docs/assets/leaderboard-preview.png)](https://yanlin-quinne.github.io/FinExam10k/leaderboard.html)
+[![FinExam-10K leaderboard preview](docs/assets/leaderboard-preview-v2.png)](docs/index.html)
 
 ## Results at a Glance
 

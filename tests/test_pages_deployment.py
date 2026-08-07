@@ -62,7 +62,7 @@ class PagesDeploymentTests(unittest.TestCase):
             "assets/site.css",
             "assets/site.js",
             "assets/figure-1-overview.png",
-            "assets/leaderboard-preview.png",
+            "assets/leaderboard-preview-v2.png",
             "data/leaderboard.json",
         ):
             self.assertTrue((self.site / asset).is_file(), asset)
