@@ -1,0 +1,18 @@
+model,access,public_all_5110,public_context_complete_3406,public_context_complete_hard_138
+Gemini-3.1-Pro,API-served,82.27,96.89,64.49
+GPT-5.6-Sol,API-served,81.55,95.98,43.48
+DeepSeek-V4-Pro,API-served,79.43,94.07,31.16
+GPT-5.6-Terra,API-served,79.24,93.63,29.71
+GPT-5.6-Luna,API-served,77.34,92.13,19.57
+DeepSeek-R1,API-served,76.97,91.75,12.32
+Claude-Sonnet-5,API-served,77.20,91.22,20.29
+GPT-5.5,API-served,71.12,87.55,28.26
+GPT-OSS-120B,Open-weight reasoning,73.52,87.08,4.35
+Qwen3.7-Max,API-served,72.23,85.79,18.84
+GPT-4o,API-served,67.65,80.59,12.32
+GPT-OSS-20B,Open-weight reasoning,67.55,80.09,5.07
+ODA-Fin-RL-8B,Finance-specialized,66.54,79.33,6.52
+Fin-o1-14B,Finance-specialized,63.86,76.13,9.42
+DianJin-R1-32B,Finance-specialized,63.23,74.08,5.07
+Fin-R1-7B,Finance-specialized,50.23,60.42,8.70
+Hawkish-8B,Finance-specialized,52.00,58.43,13.77

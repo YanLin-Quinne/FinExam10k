@@ -1,0 +1,20 @@
+field,definition
+id,Opaque 16-character public release identifier.
+exam,Examination family: CFA or FRM.
+level,"Stage within the examination family, e.g. Level II or Part I."
+program_stage,Concatenated exam and stage label.
+source_category,Public mock/practice source category or paper/session descriptor.
+publication_split,Release partition. Public records use public_mock_practice.
+difficulty,Frozen empirical difficulty band from the 17-model panel.
+consensus_pass_rate,Group-balanced frozen consensus pass rate used for difficulty.
+context_complete,Whether the standalone record has all answer-necessary local evidence.
+answerability_defect,"Defect class when context_complete is false, else blank."
+missing_referent,"Free-text description of detached table, exhibit, vignette, or other referent."
+question,Question stem as released.
+option_A,Option A text.
+option_B,Option B text.
+option_C,Option C text.
+option_D,Option D text; blank for three-option CFA items.
+answer,Gold answer letter.
+answer_text,Text of the gold option.
+rationale,Reference rationale supplied with the released record.

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finexam10k"
+version = "1.0.0"
+description = "Public partition of the FinExam-10K CFA and FRM reasoning benchmark, with prompting and scoring"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE.md"]
+authors = [{ name = "The FinExam-10K authors" }]
+dependencies = []
+
+[project.urls]
+Paper = "https://arxiv.org/abs/2608.28155"
+Leaderboard = "https://yanlin-quinne.github.io/FinExam10k/"
+
+[tool.setuptools]
+packages = ["finexam10k"]

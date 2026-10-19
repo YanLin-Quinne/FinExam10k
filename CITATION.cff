@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use FinExam-10K, please cite the paper."
+title: "FinExam-10K: When Retrieval Helps Financial Reasoning?"
+type: dataset
+repository-code: "https://github.com/YanLin-Quinne/FinExam10k"
+url: "https://yanlin-quinne.github.io/FinExam10k/"
+authors:
+  - family-names: Lin
+    given-names: Yan
+  - family-names: Sun
+    given-names: Jingyu
+  - family-names: Guo
+    given-names: Zhongliang
+  - family-names: Li
+    given-names: Qing
+  - family-names: Xie
+    given-names: Zhuohan
+  - family-names: Wang
+    given-names: Yuxia
+preferred-citation:
+  type: article
+  title: "FinExam-10K: When Retrieval Helps Financial Reasoning?"
+  authors:
+    - family-names: Lin
+      given-names: Yan
+    - family-names: Sun
+      given-names: Jingyu
+    - family-names: Guo
+      given-names: Zhongliang
+    - family-names: Li
+      given-names: Qing
+    - family-names: Xie
+      given-names: Zhuohan
+    - family-names: Wang
+      given-names: Yuxia
+  year: 2026
+  journal: "arXiv preprint arXiv:2608.28155"
+  doi: "10.48550/arXiv.2608.28155"
+  url: "https://arxiv.org/abs/2608.28155"

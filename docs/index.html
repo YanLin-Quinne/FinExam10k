@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="FinExam-10K benchmark results for professional financial examination reasoning.">
+  <title>FinExam-10K Leaderboard</title>
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#leaderboard">Skip to leaderboard</a>
+  <main class="page">
+    <header class="hero" aria-labelledby="page-title">
+      <p class="kicker">Professional finance benchmark</p>
+      <h1 id="page-title">FINEXAM-10K Leaderboard</h1>
+      <p class="subtitle">Comparing professional financial examination reasoning across CFA Levels I to III and FRM Parts I and II.</p>
+      <p class="metadata" aria-label="Benchmark summary">
+        <span>17 models</span><span>10,198 items</span><span>5 stages</span>
+      </p>
+      <p class="metadata hero-links">
+        <a href="https://arxiv.org/abs/2608.28155">Paper</a><a href="https://github.com/YanLin-Quinne/FinExam10k">Code and data</a>
+      </p>
+    </header>
+
+    <section id="leaderboard" class="leaderboard" aria-labelledby="leaderboard-title">
+      <div class="leaderboard-tools">
+        <fieldset class="category-filter">
+          <legend>Evaluation track</legend>
+          <div class="filter-pills">
+            <button class="filter-pill" type="button" data-view="cc" aria-pressed="true">Context-Complete</button>
+            <button class="filter-pill" type="button" data-view="h372" aria-pressed="false">Context-Complete Hard</button>
+            <button class="filter-pill" type="button" data-view="full" aria-pressed="false">Full Coverage</button>
+          </div>
+        </fieldset>
+        <fieldset class="category-filter">
+          <legend>Filter by access type</legend>
+          <div class="filter-pills">
+            <button class="filter-pill" type="button" data-category="all" aria-pressed="true">All</button>
+            <button class="filter-pill" type="button" data-category="Proprietary API served" aria-pressed="false">API-served</button>
+            <button class="filter-pill" type="button" data-category="Open weight reasoning" aria-pressed="false">Open-weight reasoning</button>
+            <button class="filter-pill" type="button" data-category="Finance specialized" aria-pressed="false">Finance-specialized</button>
+          </div>
+        </fieldset>
+        <div class="search-control">
+          <label for="model-search">Search models</label>
+          <input id="model-search" type="search" autocomplete="off" placeholder="Enter a model name">
+        </div>
+      </div>
+
+      <div class="table-heading">
+        <div>
+          <p id="view-label" class="section-label">Context Complete</p>
+          <h2 id="leaderboard-title">Model performance</h2>
+        </div>
+        <p id="results-status" class="results-status" aria-live="polite">Loading results</p>
+      </div>
+
+      <div class="table-shell" tabindex="0" aria-label="Scrollable model leaderboard">
+        <table>
+          <caption id="view-caption">Accuracy in percent. The 7,625 items with all answer-necessary evidence present in the local record. Select a column heading to sort.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Rank</th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="model">Model</button></th>
+              <th scope="col">Access type</th>
+              <th scope="col" aria-sort="descending"><button type="button" data-sort="accuracy">Overall</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="CFA Level I">CFA Level I</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="CFA Level II">CFA Level II</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="CFA Level III">CFA Level III</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="FRM Part I">FRM Part I</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="FRM Part II">FRM Part II</button></th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body"></tbody>
+        </table>
+      </div>
+      <p class="table-note">Values are accuracy percentages from the frozen 17-model panel. The Context-Complete Reasoning Track is the primary evaluation in the paper, and Full Coverage adds the 2,573 records whose shared vignette, table, or exhibit is not attached. Rank follows the current filter and sort order.</p>
+    </section>
+
+    <section class="methodology" aria-labelledby="methodology-title">
+      <div class="methodology-heading">
+        <p class="section-label">Evaluation protocol</p>
+        <h2 id="methodology-title">Methodology</h2>
+      </div>
+      <div class="methodology-copy">
+        <p class="method-copy">The leaderboard reports the native Direct baseline. Each model answers the item as supplied, without external function retrieval, gold labels, or reference rationales.</p>
+        <p class="method-copy">Scores use exact answer-choice accuracy over a fixed denominator. Outputs that cannot be parsed to a valid option, including length-truncated responses, are scored as incorrect.</p>
+        <nav class="resource-links" aria-label="Public resources">
+          <a href="data/finexam10k_public_5110.jsonl">Public JSONL</a>
+          <a href="data/finexam10k_public_5110.csv">Public CSV</a>
+          <a href="data/finexam10k_public_5110.xlsx">Public XLSX</a>
+          <a href="https://github.com/YanLin-Quinne/FinExam10k">GitHub repository</a>
+        </nav>
+      </div>
+    </section>
+  </main>
+  <footer>FinExam-10K results from frozen model evaluations. The 5,088 held-out items are not released.</footer>
+</body>
+</html>
